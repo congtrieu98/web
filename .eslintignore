@@ -1,0 +1,7 @@
+**/node_modules/*
+**/out/*
+**/.next/*
+coverage
+src/styles/globals.css
+next.config.mjs
+formatter.js
