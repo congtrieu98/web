@@ -15,7 +15,7 @@ export const categoriesRouter = createTRPCRouter({
       const result = await (
         await createClient()
       )
-        .from('category')
+        .from('Category')
         .insert({
           user_id: ctx.user.id,
           name: input.name,
@@ -48,7 +48,7 @@ export const categoriesRouter = createTRPCRouter({
       const result = await (
         await createClient()
       )
-        .from('category')
+        .from('Category')
         .update({
           name: input.name,
           description: input.description,
@@ -71,7 +71,7 @@ export const categoriesRouter = createTRPCRouter({
     }),
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const result = await (await createClient())
-      .from('category')
+      .from('Category')
       .select('*')
       .eq('user_id', ctx.user.id)
       .order('created_at', { ascending: false });
@@ -94,7 +94,7 @@ export const categoriesRouter = createTRPCRouter({
     )
     .mutation(async ({ input, ctx }) => {
       const result = await (await createClient())
-        .from('category')
+        .from('Category')
         .delete()
         .eq('id', input.id)
         .eq('user_id', ctx.user.id);
