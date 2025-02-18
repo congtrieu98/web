@@ -8,8 +8,8 @@ import React, { Suspense } from 'react';
 import { SearchParams } from 'nuqs/server';
 import { searchParamsCache, serialize } from '@/lib/searchparams';
 import PageContainer from '@/components/layout-dashboard/page-container';
-import CategoryTableAction from '@/pages/category/category-table/category-table-action';
-import CategoryListingPage from '@/pages/category/category-listing';
+import CategoryTableAction from '@/features/category/category-table/category-table-action';
+import CategoryListingPage from '@/features/category/category-listing';
 import { DataTableSkeleton } from '@/components/ui/table-comp/data-table-skeleton';
 
 export const metadata = {

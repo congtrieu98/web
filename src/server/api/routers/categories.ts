@@ -1,3 +1,4 @@
+import { removeAccents } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
@@ -87,7 +88,7 @@ export const categoriesRouter = createTRPCRouter({
         .eq('created_by', ctx.user.id);
 
       if (search) {
-        query = query.ilike('name', `%${search}%`);
+        query = query.ilike('name', `%${removeAccents(search)}%`);
       }
 
       const result = await query
