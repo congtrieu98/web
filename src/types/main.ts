@@ -11,3 +11,13 @@ export interface User {
   stripe_subscription_id: string | null;
   updated_at: string | null;
 }
+
+export interface Category {
+  id: string /* primary key */;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  updated_by: string;
+}

@@ -1,5 +1,7 @@
 import { PropsWithChildren } from 'react';
 
-export default function LayoutAuthorization({ children }: PropsWithChildren) {
+export default async function LayoutAuthorization({
+  children,
+}: PropsWithChildren) {
   return children;
 }

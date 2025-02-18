@@ -1,6 +1,12 @@
 'use client';
 
-import { QueryClientProvider, type QueryClient } from '@tanstack/react-query';
+import {
+  dehydrate,
+  HydrationBoundary,
+  isServer,
+  QueryClientProvider,
+  type QueryClient,
+} from '@tanstack/react-query';
 import { loggerLink, unstable_httpBatchStreamLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
@@ -12,7 +18,7 @@ import { createQueryClient } from './query-client';
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
 const getQueryClient = () => {
-  if (typeof window === 'undefined') {
+  if (isServer) {
     // Server: always make a new query client
     return createQueryClient();
   }
@@ -60,12 +66,16 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
     }),
   );
 
+  const dehydratedState = dehydrate(queryClient);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <api.Provider client={trpcClient} queryClient={queryClient}>
-        {props.children}
-      </api.Provider>
-    </QueryClientProvider>
+    <api.Provider client={trpcClient} queryClient={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <HydrationBoundary state={dehydratedState}>
+          {props.children}
+        </HydrationBoundary>
+      </QueryClientProvider>
+    </api.Provider>
   );
 }
 
