@@ -1,5 +1,5 @@
-import Container from '@/components/layout/Container';
-import Footer from '@/components/layout/Footer';
+import Container from '@/components/layout/container';
+import Footer from '@/components/layout/footer';
 import React, { PropsWithChildren, Suspense } from 'react';
 
 export default function LayoutWebClient({ children }: PropsWithChildren) {

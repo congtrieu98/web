@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Lato } from 'next/font/google';
 import { getURL } from '@/utils/helpers';
 import { siteConfig } from '@/config/site';
 import { ThemeProvider } from '@/components/theme-provider';
 import { TRPCReactProvider } from '@/trpc/react';
+import { Suspense } from 'react';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
+import { Toaster } from '@/components/ui/toaster';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -13,14 +16,10 @@ export const viewport: Viewport = {
   ],
 };
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const lato = Lato({
   subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -62,8 +61,8 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png',
+    // shortcut: '/favicon-16x16.png',
+    // apple: '/apple-touch-icon.png',
   },
   manifest: `${siteConfig.url}/site.webmanifest`,
 };
@@ -75,13 +74,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </ThemeProvider>
+      <body suppressHydrationWarning className={lato.className}>
+        <Suspense fallback={null}>
+          <NuqsAdapter>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <TRPCReactProvider>
+                {children}
+                <Toaster />
+              </TRPCReactProvider>
+            </ThemeProvider>
+          </NuqsAdapter>
+        </Suspense>
       </body>
     </html>
   );

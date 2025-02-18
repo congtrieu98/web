@@ -151,9 +151,13 @@ export async function signInWithPassword(formData: FormData) {
     );
   } else if (data.user) {
     (await cookieStore).set('preferredSignInView', 'password_signin', {
-      path: '/',
+      path: '/dashboard',
     });
-    redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
+    redirectPath = getStatusRedirect(
+      '/dashboard',
+      'Success!',
+      'You are now signed in.',
+    );
   } else {
     redirectPath = getErrorRedirect(
       '/dashboard/auth',
