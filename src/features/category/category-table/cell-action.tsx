@@ -14,7 +14,7 @@ import { api } from '@/trpc/react';
 import { Category } from '@/types/main';
 import { Edit, MoreHorizontal, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 interface CellActionProps {
   data: Category;

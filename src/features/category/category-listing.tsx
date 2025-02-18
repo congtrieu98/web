@@ -7,9 +7,9 @@ import { api } from '@/trpc/react';
 import { useSearchParams } from 'next/navigation';
 import { DataTableSkeleton } from '@/components/ui/table-comp/data-table-skeleton';
 
-type CategoryListingPage = Record<string, never> & {};
+// type CategoryListingPage = Record<string, never> & {};
 
-export default function CategoryListingPage({}: CategoryListingPage) {
+export default function CategoryListingPage() {
   // Showcasing the use of search params cache in nested RSCs
   const queryParams = useSearchParams();
   const page = queryParams?.get('page');
