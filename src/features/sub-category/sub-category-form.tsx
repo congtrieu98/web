@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -48,43 +49,43 @@ export default function SubCategoryForm({
 
   const { toast } = useToast();
 
-  const createCategory = api.category.create.useMutation({
-    onSuccess: async () => {
-      await utils.category.getAll.invalidate();
-      toast({
-        title: 'Success',
-        description: 'Category created successfully!',
-      });
-      router.push(pathName.categories);
-    },
-    onError: (error) => {
-      console.error('Error creating category:', error);
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
+  // const createCategory = api.category.create.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.category.getAll.invalidate();
+  //     toast({
+  //       title: 'Success',
+  //       description: 'Category created successfully!',
+  //     });
+  //     router.push(pathName.categories);
+  //   },
+  //   onError: (error) => {
+  //     console.error('Error creating category:', error);
+  //     toast({
+  //       title: 'Error',
+  //       description: error.message,
+  //       variant: 'destructive',
+  //     });
+  //   },
+  // });
 
-  const updateCategory = api.category.update.useMutation({
-    onSuccess: async () => {
-      await utils.category.getAll.invalidate();
-      toast({
-        title: 'Success',
-        description: 'Category updated successfully!',
-      });
-      router.push(pathName.categories);
-    },
-    onError: (error) => {
-      console.error('Error updating category:', error);
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
+  // const updateCategory = api.category.update.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.category.getAll.invalidate();
+  //     toast({
+  //       title: 'Success',
+  //       description: 'Category updated successfully!',
+  //     });
+  //     router.push(pathName.categories);
+  //   },
+  //   onError: (error) => {
+  //     console.error('Error updating category:', error);
+  //     toast({
+  //       title: 'Error',
+  //       description: error.message,
+  //       variant: 'destructive',
+  //     });
+  //   },
+  // });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,18 +93,19 @@ export default function SubCategoryForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    if (initialData?.id) {
-      updateCategory.mutate({
-        id: initialData.id,
-        name: values.name,
-        description: values.description,
-      });
-    } else {
-      createCategory.mutate({
-        name: values.name,
-        description: values.description,
-      });
-    }
+    console.log({ values });
+    // if (initialData?.id) {
+    //   updateCategory.mutate({
+    //     id: initialData.id,
+    //     name: values.name,
+    //     description: values.description,
+    //   });
+    // } else {
+    //   createCategory.mutate({
+    //     name: values.name,
+    //     description: values.description,
+    //   });
+    // }
   }
 
   return (
