@@ -109,7 +109,10 @@ export default function AppSidebar({ user }: { user: User | null }) {
                                 asChild
                                 isActive={pathname === subItem.url}
                               >
-                                <Link href={subItem.url}>
+                                <Link
+                                  href={subItem.url}
+                                  className="data-[active=true]:bg-sky-500 data-[active=true]:text-white"
+                                >
                                   <span>{subItem.title}</span>
                                 </Link>
                               </SidebarMenuSubButton>
@@ -131,9 +134,12 @@ export default function AppSidebar({ user }: { user: User | null }) {
                     isActive={
                       pathname === item.url || pathname.startsWith(item.url)
                     }
-                    className='h-11 hover:bg-gray-200 rounded-lg data-[active="true"]:bg-sky-500 data-[active="true"]:text-white [&>svg]:size-6'
+                    className="h-11 hover:bg-gray-200 rounded-lg [&>svg]:size-6"
                   >
-                    <Link href={item.url}>
+                    <Link
+                      href={item.url}
+                      className="data-[active=true]:bg-sky-500 data-[active=true]:text-white"
+                    >
                       <Icon size={24} className="text-current" />
                       <span className="text-base font-medium">
                         {item.title}
