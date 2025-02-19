@@ -58,9 +58,9 @@ export const categoriesRouter = createTRPCRouter({
           description: input.description,
           slug: input.slug,
           updated_at: new Date().toISOString(),
+          updated_by: ctx.user.id,
         })
         .eq('id', input.id)
-        .eq('created_by', ctx.user.id)
         .select()
         .single();
 
