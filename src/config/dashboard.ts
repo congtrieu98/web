@@ -5,6 +5,7 @@ import {
   Inbox,
   LineChart,
   Package,
+  ShoppingBasket,
   ShoppingCart,
   Users2,
 } from 'lucide-react';
@@ -25,6 +26,7 @@ export const iconComponents = {
   Users2,
   LineChart,
   ChartBarStacked,
+  ShoppingBasket,
   logo: Command,
 };
 
@@ -37,30 +39,18 @@ export const navConfig = [
     items: [], // Empty array as there are no child items for Dashboard
   },
   {
-    title: 'Product',
-    url: '/dashboard/product',
+    title: 'Sub Category',
+    url: '/dashboard/sub-categories',
     icon: 'Package',
     isActive: false,
     items: [], // No child items
   },
   {
-    title: 'Account',
-    url: '#', // Placeholder as there is no direct link for the parent
-    icon: 'Package',
-    isActive: true,
-
-    items: [
-      {
-        title: 'Profile',
-        url: '/dashboard/profile',
-        icon: 'Package',
-      },
-      {
-        title: 'Login',
-        url: '/',
-        icon: 'Package',
-      },
-    ],
+    title: 'Product',
+    url: '/dashboard/products',
+    icon: 'ShoppingBasket',
+    isActive: false,
+    items: [], // No child items
   },
 ];
 
@@ -68,5 +58,5 @@ export const pathName = {
   dashboard: '/dashboard',
   auth: '/dashboard/auth',
   categories: '/dashboard/categories',
-  analytics: '/dashboard/analytics',
+  subCategories: '/dashboard/sub-categories',
 };

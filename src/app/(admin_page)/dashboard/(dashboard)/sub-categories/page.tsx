@@ -8,19 +8,19 @@ import React, { Suspense } from 'react';
 import { SearchParams } from 'nuqs/server';
 import { searchParamsCache, serialize } from '@/lib/searchparams';
 import PageContainer from '@/components/layout-dashboard/page-container';
-import CategoryTableAction from '@/features/category/category-table/category-table-action';
-import CategoryListingPage from '@/features/category/category-listing';
 import { DataTableSkeleton } from '@/components/ui/table-comp/data-table-skeleton';
+import SubCategoryTableAction from '@/features/sub-category/sub-category-table/sub-category-table-action';
+import SubCategoryListingPage from '@/features/sub-category/sub-category-listing';
 
 export const metadata = {
-  title: 'Dashboard: Categories',
+  title: 'Dashboard: Sub Categories',
 };
 
 type pageProps = {
   searchParams: Promise<SearchParams>;
 };
 
-export default async function CategoryPage(props: pageProps) {
+export default async function SubCategoryPage(props: pageProps) {
   const searchParams = await props.searchParams;
   // Allow nested RSCs to access the search params (in a type-safe way)
   searchParamsCache.parse(searchParams);
@@ -31,21 +31,21 @@ export default async function CategoryPage(props: pageProps) {
     <PageContainer scrollable={false}>
       <div className="flex flex-1 flex-col space-y-4">
         <div className="flex items-start justify-between">
-          <Heading title="Categories" description="Manage categories" />
+          <Heading title="Sub Categories" description="Manage sub categories" />
           <Link
-            href="/dashboard/categories/create"
+            href="/dashboard/sub-categories/create"
             className={cn(buttonVariants(), 'text-xs md:text-sm')}
           >
             <Plus className="mr-2 h-4 w-4" /> Add New
           </Link>
         </div>
         <Separator />
-        <CategoryTableAction />
+        <SubCategoryTableAction />
         <Suspense
           key={key}
           fallback={<DataTableSkeleton columnCount={5} rowCount={10} />}
         >
-          <CategoryListingPage />
+          <SubCategoryListingPage />
         </Suspense>
       </div>
     </PageContainer>

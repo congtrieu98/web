@@ -1,5 +1,5 @@
 'use client';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Collapsible,
   CollapsibleContent,
@@ -18,7 +18,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  // SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -26,7 +25,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
 } from '@/components/ui/sidebar';
 import {
   ChevronRight,
@@ -39,22 +37,15 @@ import { usePathname, useRouter } from 'next/navigation';
 import * as React from 'react';
 import { iconComponents, navConfig } from '@/config/dashboard';
 import { createClient } from '@/utils/supabase/client';
+import { User } from '@supabase/supabase-js';
 
 export const company = {
-  name: 'Dolozi Store',
+  name: 'Dolozi Store Dashboard',
   logo: GalleryVerticalEnd,
   plan: 'Enterprise',
 };
 
-export default function AppSidebar({
-  user,
-}: {
-  user: {
-    email: string;
-    name: string;
-    avatar_url: string;
-  };
-}) {
+export default function AppSidebar({ user }: { user: User | null }) {
   const pathname = usePathname();
   const supabase = createClient();
   const router = useRouter();
@@ -72,7 +63,7 @@ export default function AppSidebar({
             <company.logo className="size-4" />
           </div>
           <div className="grid flex-1 items-center text-left text-sm leading-tight">
-            <span className="truncate font-semibold text-lg">
+            <span className="truncate font-semibold text-lg text-sky-500">
               {company.name}
             </span>
           </div>
@@ -80,7 +71,7 @@ export default function AppSidebar({
       </SidebarHeader>
       <SidebarContent className="overflow-x-hidden">
         <SidebarGroup>
-          <SidebarMenu>
+          <SidebarMenu className="gap-3">
             {navConfig.map((item) => {
               const Icon = item.icon
                 ? iconComponents[item.icon as keyof typeof iconComponents]
@@ -96,41 +87,57 @@ export default function AppSidebar({
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
                         tooltip={item.title}
-                        isActive={pathname === item.url}
+                        isActive={
+                          pathname === item.url || pathname.startsWith(item.url)
+                        }
                       >
-                        {item.icon && <Icon />}
-                        <span>{item.title}</span>
+                        {item.icon && (
+                          <Icon size={24} className="flex-shrink-0 size-6" />
+                        )}
+                        <span className="text-base font-medium">
+                          {item.title}
+                        </span>
                         <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={pathname === subItem.url}
-                            >
-                              <Link href={subItem.url}>
-                                <span>{subItem.title}</span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
+                        {item.items?.map(
+                          (subItem: { title: string; url: string }) => (
+                            <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={pathname === subItem.url}
+                              >
+                                <Link href={subItem.url}>
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ),
+                        )}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
               ) : (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem
+                  key={item.title}
+                  className="hover:bg-gray-200 rounded-lg"
+                >
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
-                    isActive={pathname === item.url}
+                    isActive={
+                      pathname === item.url || pathname.startsWith(item.url)
+                    }
+                    className='h-11 hover:bg-gray-200 rounded-lg data-[active="true"]:bg-sky-500 data-[active="true"]:text-white [&>svg]:size-6'
                   >
                     <Link href={item.url}>
-                      <Icon />
-                      <span>{item.title}</span>
+                      <Icon size={24} className="text-current" />
+                      <span className="text-base font-medium">
+                        {item.title}
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -148,20 +155,13 @@ export default function AppSidebar({
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage
-                      src={user?.email ?? ''}
-                      alt={user?.email ?? ''}
-                    />
-                    <AvatarFallback className="rounded-lg">
+                  <Avatar className="h-8 w-8 rounded-lg bg-gray-200">
+                    <AvatarFallback className="rounded-lg bg-gray-200">
                       {user?.email?.slice(0, 2)?.toUpperCase() || 'CN'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {user?.email || ''}
-                    </span>
-                    <span className="truncate text-xs">
                       {user?.email || ''}
                     </span>
                   </div>
@@ -177,20 +177,12 @@ export default function AppSidebar({
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage
-                        src={user?.avatar_url || ''}
-                        alt={user?.email || ''}
-                      />
                       <AvatarFallback className="rounded-lg">
                         {user?.email?.slice(0, 2)?.toUpperCase() || 'CN'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                       <span className="truncate font-semibold">
-                        {user?.email || ''}
-                      </span>
-                      <span className="truncate text-xs">
-                        {' '}
                         {user?.email || ''}
                       </span>
                     </div>
@@ -206,7 +198,6 @@ export default function AppSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

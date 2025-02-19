@@ -16,7 +16,6 @@ import { pathName } from '@/config/dashboard';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/trpc/react';
 import { Category } from '@/types/main';
-import { slugify } from '@/utils/helpers';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -24,17 +23,14 @@ import * as z from 'zod';
 
 const formSchema = z.object({
   name: z.string().min(1, {
-    message: 'Category name must be at least 1 characters.',
-  }),
-  slug: z.string().min(1, {
-    message: 'Category slug must be at least 1 characters.',
+    message: 'Product name must be at least 1 characters.',
   }),
   description: z.string().max(264, {
     message: 'Description must be at most 264 characters.',
   }),
 });
 
-export default function CategoryForm({
+export default function SubCategoryForm({
   initialData,
   pageTitle,
 }: {
@@ -44,7 +40,6 @@ export default function CategoryForm({
   const defaultValues = {
     name: initialData?.name || '',
     description: initialData?.description || '',
-    slug: initialData?.slug || '',
   };
 
   const router = useRouter();
@@ -54,7 +49,6 @@ export default function CategoryForm({
   const { toast } = useToast();
 
   const createCategory = api.category.create.useMutation({
-    throwOnError: false,
     onSuccess: async () => {
       await utils.category.getAll.invalidate();
       toast({
@@ -64,7 +58,7 @@ export default function CategoryForm({
       router.push(pathName.categories);
     },
     onError: (error) => {
-      console.log('Error creating category:', error);
+      console.error('Error creating category:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -74,7 +68,6 @@ export default function CategoryForm({
   });
 
   const updateCategory = api.category.update.useMutation({
-    throwOnError: false,
     onSuccess: async () => {
       await utils.category.getAll.invalidate();
       toast({
@@ -84,7 +77,7 @@ export default function CategoryForm({
       router.push(pathName.categories);
     },
     onError: (error) => {
-      console.log('Error updating category:', error);
+      console.error('Error updating category:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -104,13 +97,11 @@ export default function CategoryForm({
         id: initialData.id,
         name: values.name,
         description: values.description,
-        slug: values.slug,
       });
     } else {
       createCategory.mutate({
         name: values.name,
         description: values.description,
-        slug: values.slug,
       });
     }
   }
@@ -131,32 +122,9 @@ export default function CategoryForm({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category Name</FormLabel>
+                    <FormLabel>Product Name</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter category name"
-                        {...field}
-                        onBlur={(e) => {
-                          field.onBlur();
-                          const currentSlug = form.getValues('slug');
-                          if (!currentSlug) {
-                            form.setValue('slug', slugify(e.target.value));
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="slug"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category Slug</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter category slug" {...field} />
+                      <Input placeholder="Enter product name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -171,7 +139,7 @@ export default function CategoryForm({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Enter category description"
+                      placeholder="Enter product description"
                       className="resize-none"
                       {...field}
                     />
@@ -180,10 +148,7 @@ export default function CategoryForm({
                 </FormItem>
               )}
             />
-            <Button
-              type="submit"
-              loading={updateCategory.isPending || createCategory.isPending}
-            >
+            <Button type="submit">
               {initialData?.id ? 'Update Category' : 'Create Category'}
             </Button>
           </form>

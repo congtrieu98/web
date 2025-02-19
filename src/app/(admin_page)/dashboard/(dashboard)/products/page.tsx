@@ -20,7 +20,7 @@ type pageProps = {
   searchParams: Promise<SearchParams>;
 };
 
-export default async function CategoryPage(props: pageProps) {
+export default async function ProductsPage(props: pageProps) {
   const searchParams = await props.searchParams;
   // Allow nested RSCs to access the search params (in a type-safe way)
   searchParamsCache.parse(searchParams);

@@ -1,10 +1,10 @@
-import { Suspense } from 'react';
-import { cookies } from 'next/headers';
+import React, { Suspense } from 'react';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/layout-dashboard/app-sidebar';
 import { createClient } from '@/utils/supabase/server';
-import { getUserDetails } from '@/utils/supabase/queries';
+import { getUser } from '@/utils/supabase/queries';
 import Header from '@/components/layout-dashboard/header';
+import { User } from '@supabase/supabase-js';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -13,16 +13,13 @@ interface DashboardLayoutProps {
 export default async function DashboardLayout({
   children,
 }: DashboardLayoutProps) {
-  const cookieStore = await cookies();
-  const defaultOpen =
-    cookieStore.get('sidebar:state')?.value === 'true' || true;
   const supabase = await createClient();
-  const user = await getUserDetails(supabase);
+  const user = await getUser(supabase);
 
   return (
     <Suspense fallback={null}>
-      <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar user={user} />
+      <SidebarProvider defaultOpen={true}>
+        <AppSidebar user={user as User} />
         <SidebarInset>
           <Header />
           {/* page main content */}

@@ -29,12 +29,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       await utils.category.getAll.invalidate();
       toast({
         title: 'Success',
-        description: 'Category deleted successfully!',
+        description: 'Sub Category deleted successfully!',
       });
       setOpen(false);
     },
     onError: (error) => {
-      console.error('Error deleting category:', error);
+      console.error('Error deleting sub category:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -64,7 +64,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="center" side="left">
           <DropdownMenuItem
-            onClick={() => router.push(`${pathName.categories}/${data.id}`)}
+            onClick={() => router.push(`${pathName.subCategories}/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>

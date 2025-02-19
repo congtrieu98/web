@@ -16,6 +16,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          slug: string
           updated_at: string
           updated_by: string
         }
@@ -25,6 +26,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          slug: string
           updated_at?: string
           updated_by?: string
         }
@@ -34,6 +36,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          slug?: string
           updated_at?: string
           updated_by?: string
         }
@@ -44,7 +47,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      unaccent: {
+        Args: {
+          "": string
+        }
+        Returns: string
+      }
+      unaccent_init: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
     }
     Enums: {
       [_ in never]: never

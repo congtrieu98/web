@@ -4,7 +4,7 @@ import { getURL } from '@/utils/helpers';
 import { siteConfig } from '@/config/site';
 import { ThemeProvider } from '@/components/theme-provider';
 import { TRPCReactProvider } from '@/trpc/react';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -77,7 +77,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className={lato.className}>
         <Suspense fallback={null}>
           <NuqsAdapter>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <TRPCReactProvider>
                 {children}
                 <Toaster />

@@ -10,6 +10,7 @@ export const categoriesRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1),
         description: z.string().nullable(),
+        slug: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -20,6 +21,7 @@ export const categoriesRouter = createTRPCRouter({
         .insert({
           created_by: ctx.user.id,
           name: input.name,
+          slug: input.slug,
           description: input.description,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -43,6 +45,7 @@ export const categoriesRouter = createTRPCRouter({
         id: z.string().min(1),
         name: z.string().min(1),
         description: z.string().nullable(),
+        slug: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -53,6 +56,7 @@ export const categoriesRouter = createTRPCRouter({
         .update({
           name: input.name,
           description: input.description,
+          slug: input.slug,
           updated_at: new Date().toISOString(),
         })
         .eq('id', input.id)
@@ -78,14 +82,13 @@ export const categoriesRouter = createTRPCRouter({
         limit: z.number().min(1).max(100).default(10),
       }),
     )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }) => {
       const { search, page, limit } = input;
       const offset = (page - 1) * limit;
 
       let query = (await createClient())
         .from('Category')
-        .select('*', { count: 'exact' })
-        .eq('created_by', ctx.user.id);
+        .select('*', { count: 'exact' });
 
       if (search) {
         query = query.ilike('name', `%${removeAccents(search)}%`);
@@ -119,13 +122,11 @@ export const categoriesRouter = createTRPCRouter({
         id: z.string().min(1),
       }),
     )
-    .query(async ({ input, ctx }) => {
-      console.log({ input });
+    .query(async ({ input }) => {
       const result = await (await createClient())
         .from('Category')
         .select('*')
         .eq('id', input.id)
-        .eq('created_by', ctx.user.id)
         .single();
 
       if (result.error) {
@@ -151,12 +152,11 @@ export const categoriesRouter = createTRPCRouter({
         id: z.string().min(1),
       }),
     )
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const result = await (await createClient())
         .from('Category')
         .delete()
-        .eq('id', input.id)
-        .eq('created_by', ctx.user.id);
+        .eq('id', input.id);
 
       if (result.error) {
         console.error('Error updating category', result.error);

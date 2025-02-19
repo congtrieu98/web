@@ -9,19 +9,19 @@ import { signInWithPassword } from '@/utils/auth-helper/server';
 import { ArrowLeftIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useTransition } from 'react';
 
 export function LoginForm() {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
-    await handleRequest(e, signInWithPassword, router);
-    setIsSubmitting(false);
+    startTransition(() => {
+      handleRequest(e, signInWithPassword, router);
+    });
   };
   return (
-    <div className="flex min-h-[100dvh] flex-col bg-background px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen flex-col bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-8">
         <Link
           href="/"
@@ -34,7 +34,7 @@ export function LoginForm() {
         <div />
       </div>
       <div className="flex items-center justify-center flex-1">
-        <Card className="w-full max-w-md">
+        <Card className="max-w-md">
           <CardContent className="grid gap-4 px-4 pb-4 my-10">
             <div className="space-y-1 text-center">
               <h2 className="text-2xl font-bold">Sign In</h2>
@@ -70,7 +70,7 @@ export function LoginForm() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" loading={isSubmitting}>
+              <Button type="submit" className="w-full" loading={isPending}>
                 Sign in
               </Button>
             </form>
