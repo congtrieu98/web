@@ -13,12 +13,9 @@ export default async function CategoryViewPage({
   let category = null;
   let pageTitle = 'Create New Category';
 
-  console.log({ categoryId })
-
   if (categoryId !== 'create') {
     const data = await api?.category?.getCategoryById({ id: categoryId });
 
-    console.log({ data });
     category = data as unknown as Category;
     if (!category) {
       notFound();

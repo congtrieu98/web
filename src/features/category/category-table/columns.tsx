@@ -9,19 +9,16 @@ export const columns: ColumnDef<Category>[] = [
     header: 'Name',
   },
   {
+    accessorKey: 'slug',
+    header: 'Slug',
+  },
+  {
     accessorKey: 'description',
     header: 'Description',
   },
   {
-    accessorKey: 'created_at',
-    header: 'Created At',
-  },
-  {
-    accessorKey: 'updated_at',
-    header: 'Updated At',
-  },
-  {
     id: 'actions',
+    header: 'Actions',
     cell: ({ row }) => <CellAction data={row.original} />,
   },
 ];
