@@ -17,7 +17,7 @@ export const categoriesRouter = createTRPCRouter({
       const result = await (
         await createClient()
       )
-        .from('Category')
+        .from('category')
         .insert({
           created_by: ctx.user.id,
           name: input.name,
@@ -52,7 +52,7 @@ export const categoriesRouter = createTRPCRouter({
       const result = await (
         await createClient()
       )
-        .from('Category')
+        .from('category')
         .update({
           name: input.name,
           description: input.description,
@@ -87,7 +87,7 @@ export const categoriesRouter = createTRPCRouter({
       const offset = (page - 1) * limit;
 
       let query = (await createClient())
-        .from('Category')
+        .from('category')
         .select('*', { count: 'exact' });
 
       if (search) {
@@ -124,7 +124,7 @@ export const categoriesRouter = createTRPCRouter({
     )
     .query(async ({ input }) => {
       const result = await (await createClient())
-        .from('Category')
+        .from('category')
         .select('*')
         .eq('id', input.id)
         .single();
@@ -154,7 +154,7 @@ export const categoriesRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       const result = await (await createClient())
-        .from('Category')
+        .from('category')
         .delete()
         .eq('id', input.id);
 
