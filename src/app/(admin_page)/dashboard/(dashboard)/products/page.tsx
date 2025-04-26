@@ -8,12 +8,12 @@ import React, { Suspense } from 'react';
 import { SearchParams } from 'nuqs/server';
 import { searchParamsCache, serialize } from '@/lib/searchparams';
 import PageContainer from '@/components/layout-dashboard/page-container';
-import CategoryTableAction from '@/features/category/category-table/category-table-action';
-import CategoryListingPage from '@/features/category/category-listing';
 import { DataTableSkeleton } from '@/components/ui/table-comp/data-table-skeleton';
+import ProductListingPage from '@/features/product/product-listing';
+import ProductTableAction from '@/features/product/product-table/product-table-action';
 
 export const metadata = {
-  title: 'Dashboard: Categories',
+  title: 'Dashboard: Product',
 };
 
 type pageProps = {
@@ -31,21 +31,21 @@ export default async function ProductsPage(props: pageProps) {
     <PageContainer scrollable={false}>
       <div className="flex flex-1 flex-col space-y-4">
         <div className="flex items-start justify-between">
-          <Heading title="Categories" description="Manage categories" />
+          <Heading title="Products" description="Manage Products" />
           <Link
-            href="/dashboard/categories/create"
+            href="/dashboard/products/create"
             className={cn(buttonVariants(), 'text-xs md:text-sm')}
           >
             <Plus className="mr-2 h-4 w-4" /> Add New
           </Link>
         </div>
         <Separator />
-        <CategoryTableAction />
+        <ProductTableAction />
         <Suspense
           key={key}
           fallback={<DataTableSkeleton columnCount={5} rowCount={10} />}
         >
-          <CategoryListingPage />
+          <ProductListingPage />
         </Suspense>
       </div>
     </PageContainer>

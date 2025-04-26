@@ -133,3 +133,20 @@ export const slugify = (text: string) => {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)+/g, '');
 };
+
+// 👇 Format để hiển thị (giữ nguyên số < 10.000, thêm dấu . nếu >= 10.000)
+export function formatNumber(value: string | number): string {
+  const raw = typeof value === 'number' ? value.toString() : value;
+  const numeric = raw.replace(/\D/g, '').replace(/^0+/, '');
+  if (!numeric) return '';
+  const number = parseInt(numeric, 10);
+  if (number < 10000) return number.toString();
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+
+// 👇 Sanitize để lưu (loại ký tự không phải số, bỏ số 0 đầu)
+export function sanitizeNumber(value: string): string {
+  return value.replace(/\D/g, '').replace(/^0+/, '');
+}
+

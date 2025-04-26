@@ -59,4 +59,5 @@ export const pathName = {
   auth: '/dashboard/auth',
   categories: '/dashboard/categories',
   subCategories: '/dashboard/sub-categories',
+  products: '/dashboard/products',
 };

@@ -131,7 +131,7 @@ export default function CategoryForm({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category Name</FormLabel>
+                    <FormLabel>Category Name <span className='text-sm text-red-500'>*</span></FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Enter category name"
@@ -154,7 +154,7 @@ export default function CategoryForm({
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category Slug</FormLabel>
+                    <FormLabel>Category Slug <span className='text-sm text-red-500'>*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Enter category slug" {...field} />
                     </FormControl>

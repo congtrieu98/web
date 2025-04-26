@@ -33,3 +33,20 @@ export interface subCategory {
   created_by: string;
   updated_by: string;
 }
+
+export interface Product {
+  id: string /* primary key */;
+  productName: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  updated_by: string;
+  slug?: string;
+  quantity: number;
+  productType: Record<string, any>;
+  price: number;
+  oldPrice: number;
+  categoryId: string;
+  specs: Record<string, any>[]
+}
