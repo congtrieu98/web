@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import CustomCKEditor from '@/components/ui/CKEditor/customCKEditor';
 import {
   Form,
   FormControl,
@@ -12,7 +13,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { pathName } from '@/config/dashboard';
 import { useToast } from '@/hooks/use-toast';
 import { api } from '@/trpc/react';
@@ -21,6 +21,7 @@ import { formatNumber, sanitizeNumber, slugify } from '@/utils/helpers';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -46,9 +47,7 @@ const formSchema = z.object({
     (val) => typeof val === 'string' ? Number(val.replace(/\./g, '')) : val,
     z.number().optional()
   ),
-  description: z.string().max(264, {
-    message: 'Description must be at most 264 characters.',
-  }),
+  description: z.string(),
   productType: z.record(z.string(), z.any()),
   specs: z
     .array(
@@ -69,7 +68,7 @@ export default function ProductForm({
   initialData: Product | null;
   pageTitle: string;
 }) {
-  console.log('initialData:', initialData);
+
 
   const defaultValues = {
     productName: initialData?.productName || '',
@@ -87,8 +86,8 @@ export default function ProductForm({
     })) || [{ name: '', unit: '', option: '' }],
   };
 
-  console.log('defaultValues:', defaultValues);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  // const [imageUrls, setImageUrls] = useState<string[]>([]); 
 
   const router = useRouter();
 
@@ -150,33 +149,45 @@ export default function ProductForm({
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log('value submit product:', values);
+    try {
+      setIsSubmitting(true)
 
-    if (initialData?.id) {
-      updateProduct.mutate({
-        id: initialData.id,
-        productName: values.productName,
-        categoryId: values.categoryId,
-        description: values.description,
-        slug: values.slug,
-        quantity: values.quantity,
-        price: values.price,
-        oldPrice: values.oldPrice,
-        productType: values.productType,
-        specs: values.specs,
-      });
-    } else {
-      createProduct.mutate({
-        productName: values.productName,
-        categoryId: values.categoryId,
-        description: values.description,
-        slug: values.slug,
-        quantity: values.quantity,
-        price: values.price,
-        oldPrice: values.oldPrice,
-        productType: values.productType,
-        specs: values.specs,
+      if (initialData?.id) {
+        updateProduct.mutate({
+          id: initialData.id,
+          productName: values.productName,
+          categoryId: values.categoryId,
+          description: values.description,
+          slug: values.slug,
+          quantity: values.quantity,
+          price: values.price,
+          oldPrice: values.oldPrice,
+          productType: values.productType,
+          specs: values.specs,
+        });
+      } else {
+        createProduct.mutate({
+          productName: values.productName,
+          categoryId: values.categoryId,
+          description: values.description,
+          slug: values.slug,
+          quantity: values.quantity,
+          price: values.price,
+          oldPrice: values.oldPrice,
+          productType: values.productType,
+          specs: values.specs,
+        });
+      }
+
+    } catch (error) {
+      console.error('An error occurred:', error);
+      toast({
+        title: 'Error',
+        description: 'Tạo sản phẩm thất bại. Vui lòng kiểm tra lại.',
+        variant: 'destructive',
       });
     }
+
   }
 
   return (
@@ -430,10 +441,12 @@ export default function ProductForm({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Enter category description"
-                      className="resize-none"
-                      {...field}
+                    <CustomCKEditor
+                      onChange={(data) =>
+                        field.onChange(data)
+                      } //  Đồng bộ với form
+                      value={field.value ?? ''} // Sử dụng giá trị từ form
+                      isSubmitting={isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
