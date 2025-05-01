@@ -15,13 +15,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { pathName } from '@/config/dashboard';
 import { useToast } from '@/hooks/use-toast';
+import { base64ToFile, extractImageUrlsFromHtml, extractPublicId, replaceBase64WithUrls } from '@/lib/utils';
 import { api } from '@/trpc/react';
 import { Product } from '@/types/main';
 import { formatNumber, sanitizeNumber, slugify } from '@/utils/helpers';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
 
@@ -60,7 +60,7 @@ const formSchema = z.object({
     .min(1, 'Phải có ít nhất 1 thông số'),
 });
 
-
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 export default function ProductForm({
   initialData,
   pageTitle,
@@ -86,8 +86,6 @@ export default function ProductForm({
     })) || [{ name: '', unit: '', option: '' }],
   };
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  // const [imageUrls, setImageUrls] = useState<string[]>([]); 
 
   const router = useRouter();
 
@@ -105,7 +103,7 @@ export default function ProductForm({
         title: 'Success',
         description: 'Products created successfully!',
       });
-      router.push(pathName.categories);
+      router.push(pathName.products);
     },
     onError: (error) => {
       console.log('Error creating products:', error);
@@ -125,7 +123,7 @@ export default function ProductForm({
         title: 'Success',
         description: 'Products updated successfully!',
       });
-      router.push(pathName.categories);
+      router.push(pathName.products);
     },
     onError: (error) => {
       console.log('Error updating products:', error);
@@ -147,17 +145,60 @@ export default function ProductForm({
     name: 'specs',
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('value submit product:', values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // console.log('value submit product:', values);
+
     try {
-      setIsSubmitting(true)
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(values.description, 'text/html');
+      let imgs = doc.querySelectorAll('img');
+
+      const uploadPromises = Array.from(imgs).map(async (img, index) => {
+        const src = img.getAttribute('src');
+        if (src?.startsWith('data:image')) {
+          const ext = src.split(';')[0].split('/')[1];
+          const filename = `image_${index + 1}.${ext}`;
+          const file = base64ToFile(src, filename);
+
+
+          const signatureRes = await fetch('/api/upload-signature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folder: 'product_image_desctiption' }),
+          });
+          const { signature, timestamp, folder } = await signatureRes.json();
+
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+          formData.append('timestamp', timestamp.toString());
+          formData.append('signature', signature);
+          formData.append('folder', folder);
+
+          const cloudinaryRes = await fetch(CLOUDINARY_URL, {
+            method: 'POST',
+            body: formData,
+          });
+
+          const data = await cloudinaryRes.json();
+
+          return data.secure_url;
+        }
+      });
+
+
+      const urlListFromCloudinary = await Promise.all(uploadPromises);
+
+
+      // Gán url nhận được từ cloudinary vào src của image
+      const descriptionFinal = replaceBase64WithUrls(values.description, urlListFromCloudinary);
 
       if (initialData?.id) {
         updateProduct.mutate({
           id: initialData.id,
           productName: values.productName,
           categoryId: values.categoryId,
-          description: values.description,
+          description: descriptionFinal,
           slug: values.slug,
           quantity: values.quantity,
           price: values.price,
@@ -165,11 +206,37 @@ export default function ProductForm({
           productType: values.productType,
           specs: values.specs,
         });
+
+        // Xóa ảnh trên cloudinary
+        const oldUrls = extractImageUrlsFromHtml(initialData.description!);
+        const newUrls = extractImageUrlsFromHtml(descriptionFinal);
+
+        const deletedUrls = oldUrls.filter(url => !newUrls.includes(url));
+        console.log('deletedUrrls:', deletedUrls);
+
+
+        // Xóa ảnh không còn dùng
+        if (deletedUrls.length > 0) {
+          await Promise.all(
+            deletedUrls.map(async (url) => {
+              const publicId = extractPublicId(url);
+              if (publicId) {
+                await fetch('/api/deleted-image-cloudinary', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ public_id: publicId }),
+                });
+              }
+            })
+          );
+        }
       } else {
         createProduct.mutate({
           productName: values.productName,
           categoryId: values.categoryId,
-          description: values.description,
+          description: descriptionFinal,
           slug: values.slug,
           quantity: values.quantity,
           price: values.price,
@@ -187,7 +254,6 @@ export default function ProductForm({
         variant: 'destructive',
       });
     }
-
   }
 
   return (
@@ -445,8 +511,7 @@ export default function ProductForm({
                       onChange={(data) =>
                         field.onChange(data)
                       } //  Đồng bộ với form
-                      value={field.value ?? ''} // Sử dụng giá trị từ form
-                      isSubmitting={isSubmitting}
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormMessage />
@@ -455,7 +520,7 @@ export default function ProductForm({
             />
             <Button
               type="submit"
-            // loading={updateCategory.isPending || createCategory.isPending}
+              loading={updateProduct.isPending || createProduct.isPending}
             >
               {initialData?.id ? 'Update Category' : 'Create Category'}
             </Button>
