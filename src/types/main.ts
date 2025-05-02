@@ -49,4 +49,5 @@ export interface Product {
   oldPrice: number;
   categoryId: string;
   specs: Record<string, any>[]
+  media: string[]
 }

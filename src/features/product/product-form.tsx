@@ -24,6 +24,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
+import ImageUpload from '@/components/ui/imageUpload';
 
 const formSchema = z.object({
   productName: z.string().min(1, {
@@ -47,7 +48,7 @@ const formSchema = z.object({
     (val) => typeof val === 'string' ? Number(val.replace(/\./g, '')) : val,
     z.number().optional()
   ),
-  description: z.string(),
+  media: z.array(z.string()).min(1, { message: 'Ảnh sản phẩm không được để trống.' }),
   productType: z.record(z.string(), z.any()),
   specs: z
     .array(
@@ -58,6 +59,7 @@ const formSchema = z.object({
       })
     )
     .min(1, 'Phải có ít nhất 1 thông số'),
+  description: z.string().optional(), // Added description property
 });
 
 const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -79,6 +81,7 @@ export default function ProductForm({
     categoryId: initialData?.categoryId || '',
     quantity: initialData?.quantity || 1,
     productType: initialData?.productType || {},
+    media: initialData?.media || [],
     specs: initialData?.specs?.map((spec) => ({
       name: spec.name || '',
       unit: spec.unit || '',
@@ -146,11 +149,11 @@ export default function ProductForm({
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // console.log('value submit product:', values);
+    console.log('value submit product:', values);
 
     try {
       const parser = new DOMParser();
-      const doc = parser.parseFromString(values.description, 'text/html');
+      const doc = parser.parseFromString(values.description ?? '', 'text/html');
       let imgs = doc.querySelectorAll('img');
 
       const uploadPromises = Array.from(imgs).map(async (img, index) => {
@@ -191,7 +194,7 @@ export default function ProductForm({
 
 
       // Gán url nhận được từ cloudinary vào src của image
-      const descriptionFinal = replaceBase64WithUrls(values.description, urlListFromCloudinary);
+      const descriptionFinal = replaceBase64WithUrls(values.description ?? '', urlListFromCloudinary);
 
       if (initialData?.id) {
         updateProduct.mutate({
@@ -205,6 +208,7 @@ export default function ProductForm({
           oldPrice: values.oldPrice,
           productType: values.productType,
           specs: values.specs,
+          media: values.media
         });
 
         // Xóa ảnh trên cloudinary
@@ -243,6 +247,7 @@ export default function ProductForm({
           oldPrice: values.oldPrice,
           productType: values.productType,
           specs: values.specs,
+          media: values.media
         });
       }
 
@@ -497,9 +502,43 @@ export default function ProductForm({
                 className='flex gap-2'
               >
                 <Plus size={20} className='text-primary' />
-                Thêm dòng thông số
+                Thêm thông số
               </Button>
             </div>
+            <div>
+              <FormField
+                control={form.control}
+                name="media"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image</FormLabel>
+                    <FormControl>
+                      <ImageUpload
+                        value={field.value}
+                        onChange={(urls) => field.onChange(urls)}
+                        onRemove={async (url) => {
+                          const publicId = extractPublicId(url);
+                          if (publicId) {
+                            await fetch('/api/deleted-image-cloudinary', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify({ public_id: publicId }),
+                            });
+                          }
+                          field.onChange([
+                            ...field.value.filter((image) => image !== url),
+                          ])
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="description"

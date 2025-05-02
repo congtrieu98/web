@@ -15,6 +15,7 @@ export const productsRouter = createTRPCRouter({
         price: z.number(),
         quantity: z.number(),
         oldPrice: z.number().optional(),
+        media: z.array(z.string()),
         productType: z.record(z.string(), z.any()),
         specs: z
           .array(
@@ -44,6 +45,7 @@ export const productsRouter = createTRPCRouter({
           productType: input.productType,
           description: input.description,
           specs: input.specs,
+          media: input.media,
           created_by: ctx.user.id,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -69,6 +71,7 @@ export const productsRouter = createTRPCRouter({
         slug: z.string().min(1),
         productName: z.string().min(1),
         categoryId: z.string().min(1),
+        media: z.array(z.string()),
         price: z.preprocess(
           (val) => typeof val === 'string' ? Number(val.replace(/\./g, '')) : val,
           z.number().min(1)
@@ -108,6 +111,7 @@ export const productsRouter = createTRPCRouter({
           productType: input.productType,
           description: input.description,
           specs: input.specs,
+          media: input.media,
           created_by: ctx.user.id,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
