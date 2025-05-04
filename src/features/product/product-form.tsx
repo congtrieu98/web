@@ -559,7 +559,7 @@ export default function ProductForm({
             />
             <Button
               type="submit"
-              loading={updateProduct.isPending || createProduct.isPending}
+              disabled={updateProduct.isPending || createProduct.isPending}
             >
               {initialData?.id ? 'Update Category' : 'Create Category'}
             </Button>

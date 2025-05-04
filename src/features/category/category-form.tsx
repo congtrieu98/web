@@ -182,7 +182,7 @@ export default function CategoryForm({
             />
             <Button
               type="submit"
-              loading={updateCategory.isPending || createCategory.isPending}
+              disabled={updateCategory.isPending || createCategory.isPending}
             >
               {initialData?.id ? 'Update Category' : 'Create Category'}
             </Button>

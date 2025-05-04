@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Lato } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import { getURL } from '@/utils/helpers';
 import { siteConfig } from '@/config/site';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -17,11 +17,7 @@ export const viewport: Viewport = {
   ],
 };
 
-const lato = Lato({
-  subsets: ['latin'],
-  weight: ['400', '700', '900'],
-  display: 'swap',
-});
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
@@ -75,7 +71,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning className={lato.className}>
+      <body suppressHydrationWarning className={inter.className}>
         <Suspense fallback={null}>
           <NextTopLoader color="#3B82F6" showSpinner={false} />
           <NuqsAdapter>

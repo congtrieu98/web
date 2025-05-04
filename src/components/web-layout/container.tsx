@@ -8,6 +8,6 @@ export default function Container({
   className,
 }: PropsWithChildren<{ className?: string }>) {
   return (
-    <div className={cn('w-full h-full px-[360px]', className)}>{children}</div>
+    <div className={cn('w-full h-full', className)}>{children}</div>
   );
 }

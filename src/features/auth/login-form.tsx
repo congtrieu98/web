@@ -70,8 +70,8 @@ export function LoginForm() {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" loading={isPending}>
-                Sign in
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? 'Loading...' : 'Sign in'}
               </Button>
             </form>
           </CardContent>

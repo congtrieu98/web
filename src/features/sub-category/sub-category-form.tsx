@@ -189,7 +189,7 @@ export default function SubCategoryForm({
                 </FormItem>
               )}
             />
-            <Button type="submit">
+            <Button type="submit" disabled={updateSubCategory.isPending || createSubCategory.isPending}>
               {initialData?.id ? 'Update Category' : 'Create Category'}
             </Button>
           </form>
