@@ -3,16 +3,17 @@
 import Image from "next/image"
 import Container from "../container"
 import { MapPin, Newspaper, PcCase, Phone, Search, ShoppingCart } from "lucide-react"
+import Link from "next/link"
 
 export const TopHeader = () => {
     return (
         <Container>
             <header className=" text-white flex items-center justify-between px-4">
                 {/* Logo + Tên */}
-                <div className="flex items-center gap-4 w-[250px] shrink-0">
+                <Link href={'/'} className="flex items-center gap-4 w-[250px] shrink-0">
                     <Image src="/logo.svg" alt="Logo" width={56} height={56} className="w-14 h-14" />
                     <span className="text-2xl font-black text-white">DoloziStore</span>
-                </div>
+                </Link>
 
                 {/* Tìm kiếm + Map */}
                 <div className="flex items-center w-full max-w-[420px] mx-4 gap-2">

@@ -48,8 +48,9 @@ export function SidebarDropdownMenu({
                         <div className="flex flex-col space-y-1 w-56">
                             {menuItems.map((item, idx) => (
                                 <NavigationMenuLink
+                                    href={`/category/pc-dolozi`}
                                     key={idx}
-                                    onClick={item.onClick}
+                                    // onClick={item.onClick}
                                     className={cn(
                                         "flex items-center cursor-pointer hover:bg-[#0079FE]"
                                     )}

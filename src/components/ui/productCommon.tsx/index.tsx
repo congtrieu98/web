@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client'
 
+import Link from "next/link"
+
 // export interface productsCommonProps {
 //     product: {
 //         id: number;
@@ -18,7 +20,7 @@ export const ProductCommon = ({ products = [] }: { products: any[] }) => {
     return (
         <>
             {products?.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg shadow overflow-hidden">
+                <Link href={'/products/o-cung-hdd-asus-a561'} key={product.id} className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="relative">
                         <img src={product.img} alt={product.title} className="w-full h-full object-cover" />
                         {/* {product.label && <ProductLabel text={product.label} />} */}
@@ -37,7 +39,7 @@ export const ProductCommon = ({ products = [] }: { products: any[] }) => {
                         </div>
                         <p className="text-gray-500 text-sm mt-1 text-left">{product.description}</p>
                     </div>
-                </div>
+                </Link>
             ))}
         </>
     )

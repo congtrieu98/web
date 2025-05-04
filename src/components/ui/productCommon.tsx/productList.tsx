@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React from "react";
@@ -69,7 +70,7 @@ const ProductList = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {products.map((product) => (
-                        <div
+                        <Link href={'/products/o-cung-hdd-asus-a561'}
                             key={product.id}
                             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border"
                         >
@@ -100,7 +101,7 @@ const ProductList = () => {
                                     {product.description}
                                 </p>
                             </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>
