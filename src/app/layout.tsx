@@ -8,6 +8,7 @@ import React, { Suspense } from 'react';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
+import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Toaster } from '@/components/ui/toaster';
 
 export const viewport: Viewport = {

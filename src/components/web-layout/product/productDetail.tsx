@@ -1,60 +1,73 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import { cn } from "@/lib/utils";
+import { BadgePlus, ChevronDown, FileText, Gift, RefreshCcw, ThumbsUp } from "lucide-react";
+import React, { useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 
 const ProductDetail = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
   return (
-    <div className="bg-gray-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-
+    <div className="">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Carousel image */}
         <div>
-
-          <Carousel showArrows={true}>
+          <Carousel showArrows={true} emulateTouch={true} showStatus={false} dynamicHeight={false}>
             <div>
-              <img src="https://product.hstatic.net/1000182631/product/img_3089_62f216fb3eef451ba4d96038b71a7d70_master.jpg" />
+              <img src="https://nguyencongpc.vn/media/product/250-27440-man-hinh-gigabyte-gs27fa-1.jpg" />
             </div>
             <div>
-              <img src="https://product.hstatic.net/1000182631/product/z5283249145272_e2dedfa5565fa3f51f52969a445ed089_2fdc3af97dd94e12a2559abcb126d061_master.jpg" />
+              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc.jpg" />
             </div>
             <div>
-              <img src="https://product.hstatic.net/1000182631/product/z5283249145421_39cf43ef86cf35dc335732885c17cdcf_5da01a3c043649af97b5eda216a8d084_master.jpg" />
+              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc1.jpg" />
             </div>
             <div>
-              <img src="https://product.hstatic.net/1000182631/product/seeding_ghe_5_3ad93dffa96e4c5cb54360d11db98428_master.jpeg" />
+              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc2.jpg" />
             </div>
             <div>
-              <img src="https://product.hstatic.net/1000182631/product/thitghexanhhap_f3adb1f909a54db8b3e1530ea0e01b3a_master.jpg" />
+              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc3.jpg" />
             </div>
 
           </Carousel>
 
 
 
-          <div className="flex items-center gap-4 mt-4">
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <span>👍</span> Cam kết giá tốt nhất thị trường
+          <div className="grid lg:grid-cols-2 grid-cols-1 items-center gap-4 mt-4">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <ThumbsUp size={24} className="text-[#0F5B99]" />
+                <span className="text-sm font-semibold text-[#0F5B99]">Cam kết giá tốt nhất thị trường</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <BadgePlus size={24} className="text-[#0F5B99]" />
+                <span className="text-sm font-semibold text-[#0F5B99]">Sản phẩm mới 100%</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <span>🔄</span> Lỗi 1 đổi 1 ngay lập tức
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <span>✔️</span> Sản phẩm mới 100%
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <span>💳</span> Hỗ trợ trả góp - Thủ tục nhanh gọn
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <RefreshCcw size={24} className="text-[#0F5B99]" />
+                <span className="text-sm font-semibold text-[#0F5B99]">Lỗi 1 đổi 1 ngay lập tức</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-700">
+                <FileText size={24} className="text-[#0F5B99]" />
+                <span className="text-sm font-semibold text-[#0F5B99]">Hỗ trợ trả góp - Thủ tục nhanh gọn</span>
+              </div>
+
             </div>
           </div>
         </div>
 
-
         <div>
-
           <h1 className="text-2xl font-bold text-gray-800 mb-4">
             Ổ Cứng HDD ASUS A561
           </h1>
 
 
-          <div className="flex gap-2 mb-4 items-center border rounded-lg p-4 bg-white shadow-sm">
+          <div className="flex gap-2 mb-4 items-center border rounded-2xl p-4 bg-white shadow-sm">
             <p className="text-[#BF1F2C] text-2xl leading-5 font-extrabold">37.940.000đ</p>
             <p className="text-lg text-gray-400 line-through font-medium">40.940.000đ</p>
             <p className="text-sm text-red-600 font-semibold">
@@ -63,29 +76,89 @@ const ProductDetail = () => {
           </div>
 
 
-          <div className="mb-6">
+          {/* Thông số sản phẩm */}
+          <div className=" border rounded-2xl  p-3 mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-2">
               Thông số sản phẩm
             </h2>
-            <ul className="text-sm text-gray-700 list-disc pl-5">
-              <li>
-                Tụ điện và cuộn cảm vượt qua các bài kiểm tra thử nghiệm khắt khe để đạt được chứng nhận
-                độ bền chuẩn quân sự.
-              </li>
-              <li>
-                Tụ trục kép có độ bền gấp đôi so với thiết kế tụ trục tự thông thường.
-              </li>
-              <li>
-                Một lớp phủ PCB bảo vệ bảng mạch khỏi độ ẩm cao, bụi bẩn và nhiệt độ cao.
-              </li>
-              <li>
-                Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
-                thành phần linh kiện cao cấp khác.
-              </li>
-            </ul>
-            <a href="#" className="text-blue-500 hover:underline text-sm">
-              Xem thêm
-            </a>
+            <div
+              className={cn('text-sm text-gray-700 list-disc pl-5 transition-all duration-300 max-h-20 overflow-hidden',
+                { "max-h-full": isExpanded }
+              )}
+
+            >
+              <ul>
+                <li>
+                  Tụ điện và cuộn cảm vượt qua các bài kiểm tra thử nghiệm khắt khe để đạt được chứng nhận
+                  độ bền chuẩn quân sự.
+                </li>
+                <li>
+                  Tụ trục kép có độ bền gấp đôi so với thiết kế tụ trục tự thông thường.
+                </li>
+                <li>
+                  Một lớp phủ PCB bảo vệ bảng mạch khỏi độ ẩm cao, bụi bẩn và nhiệt độ cao.
+                </li>
+                <li>
+                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
+                  thành phần linh kiện cao cấp khác.
+                </li>
+                <li>
+                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
+                  thành phần linh kiện cao cấp khác.
+                </li>
+                <li>
+                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
+                  thành phần linh kiện cao cấp khác.
+                </li>
+                <li>
+                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
+                  thành phần linh kiện cao cấp khác.
+                </li>
+                <li>
+                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
+                  thành phần linh kiện cao cấp khác.
+                </li>
+              </ul>
+            </div>
+
+            <button
+              onClick={toggleExpand}
+              className="text-blue-500  text-sm mt-2"
+            >
+              <div className="flex gap-1 items-center">
+                {isExpanded ? "Thu gọn" : "Xem thêm"} <ChevronDown size={16} className="inline" />
+              </div>
+            </button>
+          </div>
+
+          {/* Quà tặng */}
+          <div className="flex flex-col gap-2 mb-4 items-center rounded-lg bg-white shadow-sm" style={{ border: '1px solid transparent', backgroundImage: 'linear-gradient(white, white), linear-gradient(to right, #0F5B99, #E4A835)', backgroundOrigin: 'border-box', backgroundClip: 'content-box, border-box' }}>
+            <div className="flex gap-2 bg-gradient-to-r from-[#0F5B99] to-[#E4A835] py-2 px-4 w-full rounded-t-lg">
+              <Gift size={24} className="inline text-white" />
+              <span className="text-white font-semibold">Quà tặng</span>
+            </div>
+            <div className="p-4">
+              <ul>
+                <li>
+                  Mua thêm màn hình đang được khuyến mại ( Giảm thêm 100K khi mua kèm PC )
+                </li>
+                <li>
+                  Mua thêm Gear ( Phím, Chuột, tai nghe, ghế ) đang được khuyến mại
+                </li>
+                <li>
+                  Miễn phí giao hàng toàn quốc.
+                </li>
+                <li>
+                  Hỗ trợ trả góp online toàn quốc - linh hoạt
+                </li>
+
+                <li>
+                  Bảo hành đổi mới trong thời gian đầu sử dụng - nhanh gọn.
+                </li>
+
+              </ul>
+            </div>
+
           </div>
 
 

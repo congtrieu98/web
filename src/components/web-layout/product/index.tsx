@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
+import ProductList from "@/components/ui/productCommon.tsx/productList";
+import DescriptionContent from "./descripContent";
 import ProductDetail from "./productDetail";
 
 
@@ -43,6 +45,14 @@ export const ProductPageLayout = ({ slugCat }: { slugCat: string }) => {
             {/* Sản phẩm nổi bật */}
             <div className="my-5">
                 <ProductDetail />
+            </div>
+
+            <div className="my-5">
+                <DescriptionContent />
+            </div>
+
+            <div className="my-5">
+                <ProductList text='Sản phẩm tương tự' />
             </div>
         </div>
     );

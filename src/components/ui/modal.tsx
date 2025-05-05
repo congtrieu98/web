@@ -6,10 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import React from 'react';
 
 interface ModalProps {
   title: string;
-  description: string;
+  description?: string;
   isOpen: boolean;
   onClose: () => void;
   children?: React.ReactNode;
@@ -35,7 +36,7 @@ export const Modal: React.FC<ModalProps> = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div>{children}</div>
+        <div className='max-w-[600px] max-h-[500px]'>{children}</div>
       </DialogContent>
     </Dialog>
   );

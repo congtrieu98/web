@@ -54,12 +54,12 @@ const products = [
     // Thêm các sản phẩm khác ở đây
 ];
 
-const ProductList = () => {
+const ProductList = ({ text = 'LINH KIỆN MÁY TÍNH' }: { text?: string }) => {
     return (
         <div className="py-8">
             <div className="max-w-7xl">
                 <div className="flex justify-between">
-                    <Headline text="LINH KIỆN MÁY TÍNH" />
+                    <Headline text={text} />
                     <div className="flex justify-between items-center mb-6 gap-2">
                         <span className="text-base font-normal leading-5 text-[#323232]">CHỌN THEO THƯƠNG HIỆU | </span>
                         <span className="text-base font-normal leading-5 text-[#323232]">CHỌN THEO THƯƠNG HIỆU</span>
