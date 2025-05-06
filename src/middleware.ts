@@ -10,15 +10,17 @@ export async function middleware(request: NextRequest) {
 
   const supabase = await createClient();
   const user = await getUser(supabase);
-
-  if (!user && request.nextUrl.pathname !== pathName.auth) {
-    return Response.redirect(new URL(pathName.auth, request.url));
+  // Chỉ kiểm tra xác thực khi truy cập các trang yêu cầu đăng nhập
+  if (request.nextUrl.pathname.startsWith(pathName.dashboard)) {
+    if (!user) {
+      return Response.redirect(new URL(pathName.auth, request.url));
+    }
   }
 
+  // Nếu người dùng đã đăng nhập và truy cập trang đăng nhập, chuyển hướng đến dashboard
   if (user && request.nextUrl.pathname === pathName.auth) {
     return Response.redirect(new URL(pathName.dashboard, request.url));
   }
-
   return response;
 }
 
