@@ -10,9 +10,10 @@ export async function middleware(request: NextRequest) {
 
   const supabase = await createClient();
   const user = await getUser(supabase);
+
   // Chỉ kiểm tra xác thực khi truy cập các trang yêu cầu đăng nhập
   if (request.nextUrl.pathname.startsWith(pathName.dashboard)) {
-    if (!user) {
+    if (!user && request.nextUrl.pathname !== pathName.auth) {
       return Response.redirect(new URL(pathName.auth, request.url));
     }
   }
@@ -21,6 +22,7 @@ export async function middleware(request: NextRequest) {
   if (user && request.nextUrl.pathname === pathName.auth) {
     return Response.redirect(new URL(pathName.dashboard, request.url));
   }
+
   return response;
 }
 
