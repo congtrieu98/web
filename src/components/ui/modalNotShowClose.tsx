@@ -1,9 +1,8 @@
 'use client';
 import {
   Dialog,
-  DialogContent,
+  DialogContentNoIconClose,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import React from 'react';
@@ -16,7 +15,7 @@ interface ModalProps {
   children?: React.ReactNode;
 }
 
-export const Modal: React.FC<ModalProps> = ({
+export const ModalNotShowClose: React.FC<ModalProps> = ({
   title,
   description,
   isOpen,
@@ -31,13 +30,11 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
+      <DialogContentNoIconClose className='p-0 border-none'>
+        <DialogTitle className='hidden'>{title}</DialogTitle>
+        <DialogDescription className='hidden'>{description}</DialogDescription>
         <div className='max-w-[600px] max-h-[500px]'>{children}</div>
-      </DialogContent>
+      </DialogContentNoIconClose>
     </Dialog>
   );
 };

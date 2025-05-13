@@ -1,9 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Modal } from '@/components/ui/modal';
 import { cn } from '@/lib/utils';
+import { ModalNotShowClose } from '../ui/modalNotShowClose';
 
-interface BaseModalProps {
+interface ModalNonIconCloseProps {
     isOpen: boolean;
     onClose?: () => void;
     title: string;
@@ -11,7 +11,7 @@ interface BaseModalProps {
     className?: string;
 }
 
-export const BaseModal: React.FC<BaseModalProps> = ({
+export const ModalNonIconClose: React.FC<ModalNonIconCloseProps> = ({
     isOpen,
     onClose,
     title,
@@ -29,12 +29,12 @@ export const BaseModal: React.FC<BaseModalProps> = ({
     }
 
     return (
-        <Modal
+        <ModalNotShowClose
             title={title}
             isOpen={isOpen}
             onClose={onClose}
         >
             <div className={cn("", className)}>{children}</div>
-        </Modal>
+        </ModalNotShowClose>
     );
 };

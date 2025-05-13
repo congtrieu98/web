@@ -10,6 +10,7 @@ import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Toaster } from '@/components/ui/toaster';
+import ModalConfirm from '@/components/modal/modal-confirm';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -80,6 +81,7 @@ export default function RootLayout({
               <TRPCReactProvider>
                 {children}
                 <Toaster />
+                <ModalConfirm />
               </TRPCReactProvider>
             </ThemeProvider>
           </NuqsAdapter>
