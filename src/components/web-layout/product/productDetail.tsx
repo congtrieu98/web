@@ -16,23 +16,42 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Carousel image */}
         <div>
-          <Carousel showArrows={true} emulateTouch={true} showStatus={false} dynamicHeight={false}>
+          <Carousel showArrows={true} emulateTouch={true} showStatus={false} dynamicHeight={true}>
             <div>
-              <img src="https://nguyencongpc.vn/media/product/250-27440-man-hinh-gigabyte-gs27fa-1.jpg" />
+              <img
+                src="https://nguyencongpc.vn/media/product/250-27440-man-hinh-gigabyte-gs27fa-1.jpg"
+                className="object-contain mx-auto bg-white rounded-lg"
+                alt="Ảnh sản phẩm"
+              />
             </div>
             <div>
-              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc.jpg" />
+              <img
+                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc.jpg"
+                className="object-contain mx-auto bg-white rounded-lg"
+                alt="Ảnh sản phẩm"
+              />
             </div>
             <div>
-              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc1.jpg" />
+              <img
+                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc1.jpg"
+                className="object-contain mx-auto bg-white rounded-lg"
+                alt="Ảnh sản phẩm"
+              />
             </div>
             <div>
-              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc2.jpg" />
+              <img
+                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc2.jpg"
+                className="object-contain mx-auto bg-white rounded-lg"
+                alt="Ảnh sản phẩm"
+              />
             </div>
             <div>
-              <img src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc3.jpg" />
+              <img
+                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc3.jpg"
+                className="object-contain mx-auto bg-white rounded-lg"
+                alt="Ảnh sản phẩm"
+              />
             </div>
-
           </Carousel>
 
 

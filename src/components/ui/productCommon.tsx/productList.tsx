@@ -4,6 +4,8 @@
 import React from "react";
 import { Headline } from "../headline";
 import Link from "next/link";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const products = [
     {
@@ -53,16 +55,20 @@ const products = [
     },
     // Thêm các sản phẩm khác ở đây
 ];
-
 const ProductList = ({ text = 'LINH KIỆN MÁY TÍNH' }: { text?: string }) => {
+    const isMobile = useIsMobile()
     return (
         <div className="py-8">
             <div className="max-w-7xl">
-                <div className="flex justify-between">
+                <div className="flex justify-between mb-6">
                     <Headline text={text} />
-                    <div className="flex justify-between items-center mb-6 gap-2">
-                        <span className="text-base font-normal leading-5 text-[#323232]">CHỌN THEO THƯƠNG HIỆU | </span>
-                        <span className="text-base font-normal leading-5 text-[#323232]">CHỌN THEO THƯƠNG HIỆU</span>
+                    <div className="flex justify-between items-center gap-2">
+                        <span className={cn("text-base font-normal leading-5 text-[#323232]",
+                            { 'hidden': isMobile }
+                        )}>CHỌN THEO THƯƠNG HIỆU | </span>
+                        <span className={cn("text-base font-normal leading-5 text-[#323232]",
+                            { 'hidden': isMobile }
+                        )}>CHỌN THEO THƯƠNG HIỆU</span>
                         <Link href="#" className="text-blue-500 hover:text-orange-500 font-normal leading-5">
                             Xem Tất Cả &rarr;
                         </Link>

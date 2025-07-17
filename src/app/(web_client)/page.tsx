@@ -6,6 +6,8 @@ import CarouselCommon, { BannerItem } from "@/components/ui/carouselCommon";
 import BestSellers from "@/components/web-layout/home/bestSaller";
 import ProductList from "@/components/ui/productCommon.tsx/productList";
 import NewsList from "@/components/web-layout/news";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const banners = [
@@ -28,12 +30,15 @@ export default function Home() {
       ],
     },
   ] as BannerItem[];
+  const isMobile = useIsMobile()
   return (
-    <div className="w-full h-full lg:px-[150px] md:px-[80px] px-0">
+    <div className={cn("w-full h-full lg:px-[150px] md:px-[80px] px-0",
+      { 'mt-32': isMobile }
+    )}>
       {/* banner */}
       <div className="px-5 py-4">
         <div className="flex gap-2 flex-col w-full">
-          <div>
+          {!isMobile && <div>
             <Image
               width={600}
               height={285}
@@ -41,7 +46,7 @@ export default function Home() {
               alt="Banner"
               className="w-full object-cover rounded-lg"
             />
-          </div>
+          </div>}
           <CarouselCommon items={banners} />
         </div>
       </div>

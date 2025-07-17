@@ -100,7 +100,7 @@ const BestSellers = ({ isShowBanner = true }: { isShowBanner?: boolean }) => {
     return (
         <div className="bg-gradient-to-b from-[#0F5B99] to-[#E4A835] p-4 rounded-lg">
             <div className="flex justify-between items-center mb-4">
-                <Textbody text='SẢN PHẨM BÁN CHẠY' className='text-[32px]' />
+                <Textbody text='SẢN PHẨM BÁN CHẠY' className='md:text-[32px] text-lg' />
                 <Link href="/products" className="text-blue-100 hover:text-white text-sm font-normal">Xem Tất Cả &rarr;</Link>
             </div>
             <div className="flex flex-wrap gap-4">

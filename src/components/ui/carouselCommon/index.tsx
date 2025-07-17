@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import React from 'react'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 export type BannerItem = {
     type: 'single' | 'grid'
@@ -22,6 +23,7 @@ type CarouselCommonProps = {
 
 export default function CarouselCommon({ items }: CarouselCommonProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
+    const isMobile = useIsMobile()
 
     const scrollPrev = () => emblaApi?.scrollPrev()
     const scrollNext = () => {
@@ -43,28 +45,35 @@ export default function CarouselCommon({ items }: CarouselCommonProps) {
                             key={index}
                             className="flex-[0_0_100%] p-1" // slide full width
                         >
-                            {item.type === 'single' ? (
-                                <Image
-                                    src={item.images[0].src}
-                                    alt={item.images[0].alt || 'Banner'}
-                                    width={1200}
-                                    height={400}
-                                    className="w-full h-auto object-cover rounded-lg"
-                                />
-                            ) : (
-                                <div className="grid lg:grid-cols-2 gap-2">
-                                    {item.images.map((img, idx) => (
-                                        <Image
-                                            key={idx}
-                                            src={img.src}
-                                            alt={img.alt || `Banner ${idx + 1}`}
-                                            width={600}
-                                            height={300}
-                                            className="w-full h-auto object-cover rounded-lg"
-                                        />
-                                    ))}
-                                </div>
-                            )}
+                            {isMobile ? <Image
+                                src={item.images[0].src}
+                                alt={item.images[0].alt || 'Banner'}
+                                width={1200}
+                                height={400}
+                                className="w-full h-auto object-cover rounded-lg"
+                            /> :
+                                item.type === 'single' ? (
+                                    <Image
+                                        src={item.images[0].src}
+                                        alt={item.images[0].alt || 'Banner'}
+                                        width={1200}
+                                        height={400}
+                                        className="w-full h-auto object-cover rounded-lg"
+                                    />
+                                ) : (
+                                    <div className="grid lg:grid-cols-2 gap-2">
+                                        {item.images.map((img, idx) => (
+                                            <Image
+                                                key={idx}
+                                                src={img.src}
+                                                alt={img.alt || `Banner ${idx + 1}`}
+                                                width={600}
+                                                height={300}
+                                                className="w-full h-auto object-cover rounded-lg"
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                         </div>
                     ))}
                 </div>
