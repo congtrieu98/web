@@ -10,27 +10,31 @@ import { LocationsFooter } from './locations';
 export default function Footer() {
   return (
     <footer className="h-full w-full flex flex-col">
-      <div className="flex flex-col gap-6 pb-10 md:px-[150px]">
-        <Headline text='Hệ thống cửa hàng Dolozisstore' className='px-5' />
+      
+      <Container className="bg-gray-50">
+      <div className="flex flex-col gap-6 pb-10 px-5">
+        <Headline text='Hệ thống cửa hàng Dolozistore' />
         <LocationsFooter />
       </div>
-      <Container className="md:bg-[#E5E5E5] bg-[#F8F9FB] p-5">
-        <div className='w-full grid grid-cols-2 md:grid-cols-4 gap-3 md:px-[150px]'>
+
+      </Container>
+      <div className='w-full md:bg-[#E5E5E5] bg-[#F8F9FB]'>
+        <Container className='w-full grid grid-cols-2 md:grid-cols-4 gap-3 md:px-0 p-5'>
           <article className="py-6 px-3 flex flex-row flex-1 gap-3 items-center justify-center bg-[#FFFFFF] rounded-lg">
-            <Image
-              src="/assets/icons/delivery.svg"
-              alt="delivery"
-              width={60}
-              height={44}
-            />
-            <div className="flex flex-col gap-1">
-              <h3 className="text-sm font-semibold leading-5 text-left">
-                CHÍNH SÁCH GIAO HÀNG
-              </h3>
-              <p className="text-[0.81rem] font-semibold leading-5 text-left text-[#646464]">
-                Nhận hàng và thanh toán tại nhà
-              </p>
-            </div>
+              <Image
+                src="/assets/icons/delivery.svg"
+                alt="delivery"
+                width={60}
+                height={44}
+              />
+              <div className="flex flex-col gap-1">
+                <h3 className="text-sm font-semibold leading-5 text-left">
+                  CHÍNH SÁCH GIAO HÀNG
+                </h3>
+                <p className="text-[0.81rem] font-semibold leading-5 text-left text-[#646464]">
+                  Nhận hàng và thanh toán tại nhà
+                </p>
+              </div>
           </article>
           <article className="py-6 px-3 flex flex-1 flex-row gap-3 items-center justify-center bg-[#FFFFFF] rounded-lg">
             <Image
@@ -75,12 +79,11 @@ export default function Footer() {
               </p>
             </div>
           </article>
+        </Container>
         </div>
 
-      </Container>
-
       {/* DESKTOP */}
-      <Container className="w-full h-[500px] md:flex flex-col gap-8 pt-[60px] hidden px-[150px]">
+      <Container className="w-full h-[500px] md:flex flex-col gap-8 pt-[60px] hidden">
         <nav
           className="flex flex-row justify-between p-5"
           aria-label="Footer Navigation"

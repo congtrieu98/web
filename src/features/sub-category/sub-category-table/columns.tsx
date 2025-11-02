@@ -10,10 +10,6 @@ export const columns: ColumnDef<Category>[] = [
     header: 'Name',
   },
   {
-    accessorKey: 'description',
-    header: 'Description',
-  },
-  {
     accessorKey: 'created_at',
     header: 'Created At',
     cell: ({ row }) => formatDate(row.original.created_at),

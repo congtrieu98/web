@@ -2,25 +2,44 @@
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { TopHeader } from "./topHeader"
-import { SidebarDropdownMenu } from "./navigationMenuBar"
+import { MenuItem, SidebarDropdownMenu } from "./navigationMenuBar"
 import { Menu, Folder, PcCase } from "lucide-react"
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-
-const items = [
-    { label: "Linh kiện máy tính", icon: <Folder className="w-4 h-4" /> },
-    { label: "Màn hình", icon: <Folder className="w-4 h-4" /> },
-    { label: "Laptop", icon: <Folder className="w-4 h-4" /> },
-    { label: "Thiết bị lưu trữ", icon: <Folder className="w-4 h-4" /> },
-    { label: "Phím - Chuột Gaming", icon: <Folder className="w-4 h-4" /> },
-]
+import { api } from "@/trpc/react"
+import { JSX } from "react"
+import Container from "../container"
 
 export const Header = () => {
     const isMobile = useIsMobile()
     const [isSticky, setIsSticky] = useState(false);
-
     const [search, setSearch] = useState('')
+
+    // Fetch categories data
+    const { data: categories, isLoading: categoriesLoading } = api.category.getAllCategoriesPublic.useQuery();
+    const { data: subCategories } = api.subCategory.getAllWithoutPagination.useQuery();
+
+    // Transform categories data for UI
+    const categoryItems = categories?.map(category => ({
+        label: category.name,
+        icon: <Folder className="w-4 h-4" />,
+        id: category.id,
+        slug: category.slug
+    })) || [];
+
+    const subCategoriesByCategory = subCategories?.reduce((acc, subCategory) => {
+        if (!acc[subCategory.category_id!]) {
+            acc[subCategory.category_id!] = [];
+        }
+        acc[subCategory.category_id!].push({
+            label: subCategory.name,
+            icon: <Folder className="w-4 h-4" />,
+            id: subCategory.id,
+            slug: subCategory.name.toLowerCase().replace(/\s+/g, '-')
+        });
+        return acc;
+    }, {} as Record<string, Array<{label: string, icon: JSX.Element, id: string, slug: string}>>) || {};
 
     useEffect(() => {
         const handleScroll = () => {
@@ -88,10 +107,13 @@ export const Header = () => {
 
                     {/* Category navigation */}
                     <nav className="flex justify-between text-sm font-medium">
-                        <span>PC DOLOZI</span>
-                        <span>Linh kiện máy tính</span>
-                        <span>Màn hình</span>
-                        <span>Laptop</span>
+                        {categoriesLoading ? (
+                            <span>Đang tải...</span>
+                        ) : (
+                            categoryItems.slice(0, 4).map((category) => (
+                                <span key={category.id}>{category.label}</span>
+                            ))
+                        )}
                     </nav>
                 </header>
             </div>
@@ -112,49 +134,34 @@ export const Header = () => {
             {/* Bottom header */}
             <div className="bg-[rgba(228,168,53,1)]">
                 <div className='px-[150px]'>
-                    <div className="flex gap-2 px-5 py-2">
-                        <SidebarDropdownMenu
-                            title="DANH MỤC SẢN PHẨM"
-                            menuIcon={<Menu className="w-4 h-4" />}
-                            menuItems={items}
-                        />
-                        <SidebarDropdownMenu
-                            title="PC Dolozi"
-                            menuIcon={<PcCase className="w-4 h-4 text-gray-900" />}
-                            menuItems={items}
-                            variant="ghost"
-                        />
-                        <SidebarDropdownMenu
-                            title="Linh kiện máy tính"
-                            menuIcon={<PcCase className="w-4 h-4 text-gray-900" />}
-                            menuItems={items}
-                            variant="ghost"
-                        />
-                        <SidebarDropdownMenu
-                            title="Màn hình"
-                            menuIcon={<PcCase className="w-4 h-4 text-gray-900" />}
-                            menuItems={items}
-                            variant="ghost"
-                        />
-                        <SidebarDropdownMenu
-                            title="Laptop"
-                            menuIcon={<PcCase className="w-4 h-4 text-gray-900" />}
-                            menuItems={items}
-                            variant="ghost"
-                        />
-                        <SidebarDropdownMenu
-                            title="Thiết bị lưu trữ"
-                            menuIcon={<PcCase className="w-4 h-4 text-gray-900" />}
-                            menuItems={items}
-                            variant="ghost"
-                        />
-                        <SidebarDropdownMenu
-                            title="Phím - Chuột Gaming"
-                            menuIcon={<PcCase className="w-4 h-4 text-gray-900" />}
-                            menuItems={items}
-                            variant="ghost"
-                        />
-                    </div>
+                    <Container>
+                        <div className="flex gap-2 px-5 py-2">
+                            <SidebarDropdownMenu
+                                title="DANH MỤC SẢN PHẨM"
+                                menuIcon={<Menu className="w-4 h-4" />}
+                                menuItems={categoryItems as MenuItem[]}
+                            />
+                            {categoriesLoading ? (
+                                <div className="flex gap-2">
+                                    {[...Array(5)].map((_, index) => (
+                                        <div key={index} className="px-4 py-2 bg-gray-200 rounded animate-pulse">
+                                            <span className="text-transparent">Loading...</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                categoryItems.slice(0, 5).map((category) => (
+                                    <SidebarDropdownMenu
+                                        key={category.id}
+                                        title={category.label}
+                                        menuIcon={<PcCase className="w-4 h-4 text-gray-900" />}
+                                        menuItems={subCategoriesByCategory[category.id] || []}
+                                        variant="ghost"
+                                    />
+                                ))
+                            )}
+                        </div>
+                    </Container>
                 </div>
             </div>
         </>

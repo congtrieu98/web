@@ -11,8 +11,8 @@ export default function ProductPage(props: {
 }) {
     const { slug } = use(props.params);
     return (
-        <div className="w-full h-full lg:px-[150px] md:px-[80px] px-0">
-            <ProductPageLayout slugCat={slug} />
+        <div className="px-5">
+            <ProductPageLayout slugProduct={slug} />
         </div>
     );
 }

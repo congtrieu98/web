@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { pathName } from '@/config/dashboard';
 import { useToast } from '@/hooks/use-toast';
-import { base64ToFile, extractImageUrlsFromHtml, extractPublicId, replaceBase64WithUrls } from '@/lib/utils';
+import { base64ToFile, extractImageUrlsFromHtml, replaceBase64WithUrls } from '@/lib/utils';
 import { api } from '@/trpc/react';
 import { Product } from '@/types/main';
 import { formatNumber, sanitizeNumber, slugify } from '@/utils/helpers';
@@ -24,7 +24,9 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useFieldArray, useForm } from 'react-hook-form';
 import * as z from 'zod';
-import ImageUpload from '@/components/ui/imageUpload';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import { createClient } from '@/utils/supabase/client';
 
 const formSchema = z.object({
   productName: z.string().min(1, {
@@ -36,6 +38,7 @@ const formSchema = z.object({
   categoryId: z.string().min(1, {
     message: 'Danh mục không được để trống.',
   }),
+  brandId: z.string().nullable().optional(),
   price: z.preprocess(
     (val) => typeof val === 'string' ? Number(val.replace(/\./g, '')) : val,
     z.number().min(1, { message: 'Giá sản phẩm không được để trống.' })
@@ -48,7 +51,12 @@ const formSchema = z.object({
     (val) => typeof val === 'string' ? Number(val.replace(/\./g, '')) : val,
     z.number().optional()
   ),
-  media: z.array(z.string()).min(1, { message: 'Ảnh sản phẩm không được để trống.' }),
+  media: z.array(z.string()).refine(() => {
+    // Custom validation sẽ được thêm trong useEffect
+    return true;
+  }, {
+    message: 'Ảnh sản phẩm không được để trống.',
+  }),
   productType: z.record(z.string(), z.any()),
   specs: z
     .array(
@@ -62,7 +70,6 @@ const formSchema = z.object({
   description: z.string().optional(), // Added description property
 });
 
-const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
 export default function ProductForm({
   initialData,
   pageTitle,
@@ -70,7 +77,13 @@ export default function ProductForm({
   initialData: Product | null;
   pageTitle: string;
 }) {
-
+  const supabase = createClient();
+  const [files, setFiles] = useState<any[]>([]);
+  const [filesPreview, setFilesPreview] = useState<any[]>([]);
+  const [pendingCleanup, setPendingCleanup] = useState<{
+    oldMediaUrls?: string[];
+    oldContentImages?: string[];
+  }>({});
 
   const defaultValues = {
     productName: initialData?.productName || '',
@@ -79,6 +92,7 @@ export default function ProductForm({
     oldPrice: initialData?.oldPrice || 0,
     price: initialData?.price || 0,
     categoryId: initialData?.categoryId || '',
+    brandId: initialData?.brandId || '',
     quantity: initialData?.quantity || 1,
     productType: initialData?.productType || {},
     media: initialData?.media || [],
@@ -96,7 +110,59 @@ export default function ProductForm({
 
   const { toast } = useToast();
 
-  const { data: listCategory } = api.category.getAll.useQuery({});
+  // Function để xóa ảnh cũ từ Supabase Storage
+  const deleteOldImages = useCallback(async (oldUrls: string[]) => {
+    if (oldUrls.length === 0) {
+      console.log('No old images to delete');
+      return;
+    }
+    
+    console.log('Starting to delete old images:', oldUrls);
+    
+    try {
+      await Promise.all(
+        oldUrls.map(async (url) => {
+          console.log('Processing URL for deletion:', url);
+          
+          // Extract path từ URL Supabase
+          if (url.includes('/storage/v1/object/public/')) {
+            const urlParts = url.split('/storage/v1/object/public/');
+            if (urlParts.length > 1) {
+              let filePath = urlParts[1];
+              
+              // Loại bỏ bucket name nếu có (products/)
+              if (filePath.startsWith('products/')) {
+                filePath = filePath.substring(9); // Loại bỏ "products/"
+              }
+              
+              console.log('Extracted file path:', filePath);
+              console.log('Original URL:', url);
+              
+              const { error } = await supabase.storage
+                .from("products")
+                .remove([filePath]);
+              
+              if (error) {
+                console.error('Error deleting old image:', error);
+              } else {
+                console.log('Successfully deleted old image:', filePath);
+              }
+            } else {
+              console.error('Could not extract file path from URL:', url);
+            }
+          } else {
+            console.log('URL does not contain Supabase storage path:', url);
+          }
+        })
+      );
+    } catch (error) {
+      console.error('Error in deleteOldImages:', error);
+    }
+  }, [supabase]);
+
+
+  const { data: listCategory } = api.category.getAllWithoutPagination.useQuery();
+  const { data: listBrands } = api.brands.getAllBrandsPublic.useQuery();
 
   const createProduct = api.products.create.useMutation({
     throwOnError: false,
@@ -148,13 +214,204 @@ export default function ProductForm({
     name: 'specs',
   });
 
+  // Khởi tạo filesPreview từ initialData khi component mount
+  useEffect(() => {
+    if (initialData?.media && initialData.media.length > 0) {
+      setFilesPreview(initialData.media);
+    }
+  }, [initialData]);
+
+  // Xử lý cleanup ảnh cũ khi có pendingCleanup
+  useEffect(() => {
+    const performCleanup = async () => {
+      if (pendingCleanup.oldMediaUrls?.length || pendingCleanup.oldContentImages?.length) {
+        console.log('Performing cleanup for:', pendingCleanup);
+        
+        const urlsToDelete: string[] = [];
+        
+        if (pendingCleanup.oldMediaUrls?.length) {
+          urlsToDelete.push(...pendingCleanup.oldMediaUrls);
+        }
+        
+        if (pendingCleanup.oldContentImages?.length) {
+          urlsToDelete.push(...pendingCleanup.oldContentImages);
+        }
+        
+        if (urlsToDelete.length > 0) {
+          await deleteOldImages(urlsToDelete);
+        }
+        
+        // Clear pending cleanup
+        setPendingCleanup({});
+      }
+    };
+    
+    performCleanup();
+  }, [pendingCleanup, deleteOldImages]);
+
+  // Validate media field dựa trên filesPreview (chỉ khi có tương tác)
+  useEffect(() => {
+    // Chỉ validate khi form đã được touched hoặc có initialData
+    const isFormTouched = form.formState.isSubmitted || form.formState.isDirty;
+    const hasInitialData = !!initialData;
+    
+    if (isFormTouched || hasInitialData) {
+      if (filesPreview.length === 0) {
+        form.setError('media', {
+          type: 'manual',
+          message: 'Ảnh sản phẩm không được để trống.',
+        });
+      } else {
+        form.clearErrors('media');
+        // Đồng bộ filesPreview với form field
+        form.setValue('media', filesPreview);
+      }
+    } else {
+      // Khi chưa có tương tác, chỉ đồng bộ filesPreview với form field
+      form.setValue('media', filesPreview);
+    }
+  }, [filesPreview, form, initialData]);
+
+  // Logic xử lý file upload cho media
+  const handlePreviewImages = (fileList: File[]) => {
+    const filesArray = fileList.map(
+      (file: File) => URL.createObjectURL(file),
+    );
+    setFilesPreview((prevImages) => prevImages.concat(filesArray));
+    fileList.map((file: any) => URL.revokeObjectURL(file));
+  };
+
+  const triggerFileInput = () => {
+    document.getElementById("fileInput")?.click();
+  };
+
+  const handleFileSelect = (e: any) => {
+    let selectedFiles: File[] = Array.from(e.target.files);
+    if (selectedFiles) {
+      handleValidateImageFiles(selectedFiles);
+    }
+    // Reset file input để có thể chọn lại cùng file
+    e.target.value = '';
+  };
+
+  const handleDeleteImage = (data: { image: string; key: number }) => {
+    // Xóa file khỏi files array (nếu có)
+    if (files && files.length > 0) {
+      setFiles(files?.filter((_, index) => index !== data?.key));
+    }
+    
+    // Cập nhật filesPreview và form field
+    const updatedFilesPreview = filesPreview.filter((e) => {
+      if (e?.image) {
+        return e?.image !== data?.image;
+      } else {
+        return e !== data?.image;
+      }
+    });
+    setFilesPreview(updatedFilesPreview);
+    
+    // Đồng bộ với form field
+    form.setValue('media', updatedFilesPreview);
+    
+    // Reset file input để có thể chọn lại file
+    const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
+  const handleValidateImageFiles = (fileList: File[]) => {
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2Mb
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+    
+    for (const file of fileList) {
+      //@ts-ignore
+      if (!allowedExtensions.exec(file.name)) {
+        toast({
+          title: 'Error',
+          description: 'Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      //@ts-ignore
+      if (file.size > MAX_FILE_SIZE) {
+        //@ts-ignore
+        toast({
+          title: 'Error',
+          description: `File ${file.name} is too large and has been excluded.`,
+          variant: 'destructive',
+        });
+        return false;
+      }
+    }
+
+    // Thêm file mới vào files array
+    if (files && files?.length > 0) {
+      setFiles((file) => [...file, ...fileList]);
+    } else setFiles(fileList);
+    handlePreviewImages(fileList);
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     console.log('value submit product:', values);
+    
+    // Validate media field
+    if (filesPreview.length === 0) {
+      form.setError('media', {
+        type: 'manual',
+        message: 'Ảnh sản phẩm không được để trống.',
+      });
+      return;
+    }
+    
+    let mediaUrls = values.media;
+    let oldMediaUrls: string[] = [];
+    
+    // Upload media mới nếu có
+    if (files?.length > 0) {
+      // Lưu media cũ để xóa sau
+      if (initialData?.media && initialData.media.length > 0) {
+        oldMediaUrls = initialData.media;
+      }
+      
+      const uploadPromises = await Promise.all(
+        files.map(async (file) => {
+          let path = `thumbnails/${Date.now()}_${file.name}`;
+          const { data: url, error } = await supabase.storage
+            .from("products")
+            .upload(path, file);
+          
+          if (error) {
+            console.error('Error uploading media:', error);
+            throw new Error(`Failed to upload media: ${error.message}`);
+          }
+          
+          if (!url?.fullPath) {
+            throw new Error('No URL returned from media upload');
+          }
+          
+          return process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/" + url.fullPath;
+        }),
+      );
+      
+      console.log('Media upload promises result:', uploadPromises);
+      mediaUrls = uploadPromises;
+    } else {
+      // Nếu không có file mới, sử dụng ảnh từ initialData
+      mediaUrls = initialData?.media || [];
+    }
 
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(values.description ?? '', 'text/html');
       let imgs = doc.querySelectorAll('img');
+
+      // Lưu ảnh cũ trong content để xóa sau
+      let oldContentImages: string[] = [];
+      if (initialData?.description) {
+        oldContentImages = extractImageUrlsFromHtml(initialData.description);
+      }
 
       const uploadPromises = Array.from(imgs).map(async (img, index) => {
         const src = img.getAttribute('src');
@@ -163,44 +420,55 @@ export default function ProductForm({
           const filename = `image_${index + 1}.${ext}`;
           const file = base64ToFile(src, filename);
 
-
-          const signatureRes = await fetch('/api/upload-signature', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ folder: 'product_image_desctiption' }),
-          });
-          const { signature, timestamp, folder } = await signatureRes.json();
-
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
-          formData.append('timestamp', timestamp.toString());
-          formData.append('signature', signature);
-          formData.append('folder', folder);
-
-          const cloudinaryRes = await fetch(CLOUDINARY_URL, {
-            method: 'POST',
-            body: formData,
-          });
-
-          const data = await cloudinaryRes.json();
-
-          return data.secure_url;
+          let path = `content/${Date.now()}_${file.name}`;
+          const { data: url, error } = await supabase.storage
+            .from("products")
+            .upload(path, file);
+          
+          if (error) {
+            console.error('Error uploading content image:', error);
+            return null;
+          }
+          
+          return url?.fullPath || null;
         }
+        return null;
       });
 
+      const urlListFromSupabase = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
 
-      const urlListFromCloudinary = await Promise.all(uploadPromises);
-
-
-      // Gán url nhận được từ cloudinary vào src của image
-      const descriptionFinal = replaceBase64WithUrls(values.description ?? '', urlListFromCloudinary);
+      // Gán url nhận được từ Supabase vào src của image
+      const descriptionFinal = replaceBase64WithUrls(values.description ?? '', urlListFromSupabase);
 
       if (initialData?.id) {
+        // Chuẩn bị cleanup data
+        const cleanupData: {
+          oldMediaUrls?: string[];
+          oldContentImages?: string[];
+        } = {};
+        
+        // Xóa media cũ nếu có
+        if (oldMediaUrls.length > 0) {
+          cleanupData.oldMediaUrls = oldMediaUrls;
+        }
+        
+        // Xóa ảnh content cũ nếu có
+        if (oldContentImages.length > 0) {
+          // Lấy ảnh mới trong content để so sánh
+          const newContentImages = extractImageUrlsFromHtml(descriptionFinal);
+          const imagesToDelete = oldContentImages.filter(oldImg => !newContentImages.includes(oldImg));
+          
+          if (imagesToDelete.length > 0) {
+            cleanupData.oldContentImages = imagesToDelete;
+          }
+        }
+        
+        // Update product trước
         updateProduct.mutate({
           id: initialData.id,
           productName: values.productName,
           categoryId: values.categoryId,
+          brandId: values.brandId || null,
           description: descriptionFinal,
           slug: values.slug,
           quantity: values.quantity,
@@ -208,38 +476,18 @@ export default function ProductForm({
           oldPrice: values.oldPrice,
           productType: values.productType,
           specs: values.specs,
-          media: values.media
+          media: mediaUrls
         });
 
-        // Xóa ảnh trên cloudinary
-        const oldUrls = extractImageUrlsFromHtml(initialData.description!);
-        const newUrls = extractImageUrlsFromHtml(descriptionFinal);
-
-        const deletedUrls = oldUrls.filter(url => !newUrls.includes(url));
-        console.log('deletedUrrls:', deletedUrls);
-
-
-        // Xóa ảnh không còn dùng
-        if (deletedUrls.length > 0) {
-          await Promise.all(
-            deletedUrls.map(async (url) => {
-              const publicId = extractPublicId(url);
-              if (publicId) {
-                await fetch('/api/deleted-image-cloudinary', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ public_id: publicId }),
-                });
-              }
-            })
-          );
+        // Set pending cleanup để useEffect xử lý
+        if (cleanupData.oldMediaUrls?.length || cleanupData.oldContentImages?.length) {
+          setPendingCleanup(cleanupData);
         }
       } else {
         createProduct.mutate({
           productName: values.productName,
           categoryId: values.categoryId,
+          brandId: values.brandId || null,
           description: descriptionFinal,
           slug: values.slug,
           quantity: values.quantity,
@@ -247,7 +495,7 @@ export default function ProductForm({
           oldPrice: values.oldPrice,
           productType: values.productType,
           specs: values.specs,
-          media: values.media
+          media: mediaUrls
         });
       }
 
@@ -326,7 +574,37 @@ export default function ProductForm({
                         </FormControl>
                         <SelectContent>
                           {
-                            listCategory?.data.map((cat) => <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>)
+                            listCategory?.map((cat) => <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>)
+                          }
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="brandId"
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <FormLabel>Brand</FormLabel>
+                      <Select 
+                        onValueChange={(value) => field.onChange(value === 'none' ? null : value)} 
+                        defaultValue={field.value || undefined}
+                        value={field.value || undefined}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue
+                              className='text-gray-500 bg-black'
+                              placeholder="Chọn thương hiệu sản phẩm" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {
+                            listBrands?.map((brand) => <SelectItem key={brand.id} value={brand.id}>{brand.name}</SelectItem>)
                           }
                         </SelectContent>
                       </Select>
@@ -509,34 +787,57 @@ export default function ProductForm({
               <FormField
                 control={form.control}
                 name="media"
-                render={({ field }) => (
+                render={() => (
                   <FormItem>
-                    <FormLabel>Image</FormLabel>
+                    <FormLabel>Product Images <span className='text-sm text-red-500'>*</span></FormLabel>
                     <FormControl>
-                      <ImageUpload
-                        value={field.value}
-                        onChange={(urls) => field.onChange(urls)}
-                        onRemove={async (url) => {
-                          const publicId = extractPublicId(url);
-                          if (publicId) {
-                            await fetch('/api/deleted-image-cloudinary', {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json',
-                              },
-                              body: JSON.stringify({ public_id: publicId }),
-                            });
-                          }
-                          field.onChange([
-                            ...field.value.filter((image) => image !== url),
-                          ])
-                        }}
-                      />
+                      <Button onClick={triggerFileInput} className='flex flex-col gap-2 bg-slate-200 text-primary' type='button' variant='ghost'>
+                        <input
+                          title="get-image-file"
+                          id="fileInput"
+                          type="file"
+                          className="hidden"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => handleFileSelect(e)}
+                        />
+                        Chọn ảnh sản phẩm
+                      </Button>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+            
+            {/* Show image previews */}
+            <div className="h-auto rounded-[8px] bg-slate-50 p-4">
+              <div className="flex flex-wrap gap-4">
+                {filesPreview &&
+                  filesPreview.map((item, index) => {
+                    return <div key={index} className="relative w-[200px] h-[200px] flex-shrink-0">
+                      <div className="absolute top-2 right-2 z-10">
+                        <Button type="button"
+                          onClick={() => handleDeleteImage({
+                            image:
+                              typeof item === "object"
+                                ? item.image
+                                : item,
+                            key: index,
+                          })}
+                          size="sm" className="hover:bg-red-400 bg-black text-white">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Image
+                        src={typeof item === "object" ? item.image : item}
+                        alt="product"
+                        className="object-cover rounded-lg"
+                        fill
+                      />
+                    </div>
+                  })}
+              </div>
             </div>
 
             <FormField
@@ -561,7 +862,7 @@ export default function ProductForm({
               type="submit"
               disabled={updateProduct.isPending || createProduct.isPending}
             >
-              {initialData?.id ? 'Update Category' : 'Create Category'}
+              {initialData?.id ? 'Update Product' : 'Create Product'}
             </Button>
           </form>
         </Form>

@@ -31,7 +31,7 @@ export function replaceBase64WithUrls(htmlContent: string, urlList: string[]): s
     if (src?.startsWith('data:image')) {
       const cloudUrl = urlList[idx];
       if (cloudUrl) {
-        img.setAttribute('src', cloudUrl);
+        img.setAttribute('src', `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${cloudUrl}`);
         // imgIndex++;
       }
     }
@@ -40,14 +40,16 @@ export function replaceBase64WithUrls(htmlContent: string, urlList: string[]): s
   return doc.body.innerHTML;
 }
 
-//Get danh urls cũ
+//Get danh urls cũ từ Supabase
 export function extractImageUrlsFromHtml(html: string): string[] {
   const urls: string[] = [];
   const regex = /<img[^>]+src="([^">]+)"/g;
   let match;
   while ((match = regex.exec(html)) !== null) {
-    if (match[1].startsWith('https://res.cloudinary.com')) {
-      urls.push(match[1]);
+    const url = match[1];
+    // Lấy ảnh từ Supabase Storage
+    if (url.includes('/storage/v1/object/public/')) {
+      urls.push(url);
     }
   }
   return urls;

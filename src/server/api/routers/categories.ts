@@ -2,9 +2,71 @@ import { removeAccents } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
 export const categoriesRouter = createTRPCRouter({
+  getCategoryBySlug: publicProcedure
+  .input(
+    z.object({
+      slug: z.string().min(1),
+    }),
+  )
+  .query(async ({ input }) => {
+    try {
+      const supabase = await createClient();
+      
+      // Lấy category
+      const categoryResult = await supabase
+        .from('category')
+        .select('*')
+        .eq('slug', input.slug)
+        .single();
+
+      if (categoryResult.error) {
+        console.error('Error fetching category by slug:', categoryResult.error);
+        
+        // Nếu không tìm thấy category, trả về null thay vì throw error
+        if (categoryResult.error.code === 'PGRST116') {
+          console.log('Category not found with slug:', input.slug);
+          return null;
+        }
+        
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: categoryResult.error.message,
+        });
+      }
+
+      if (!categoryResult.data) {
+        console.log('No data returned for slug:', input.slug);
+        return null;
+      }
+
+      // Lấy danh sách products theo categoryId
+      const productsResult = await supabase
+        .from('product')
+        .select('*')
+        .eq('categoryId', categoryResult.data.id)
+        .order('created_at', { ascending: false });
+
+      if (productsResult.error) {
+        console.error('Error fetching products by category:', productsResult.error);
+        // Không throw error, chỉ log và trả về empty array
+      }
+
+      // Trả về category kèm danh sách products
+      return {
+        ...categoryResult.data,
+        products: productsResult.data || [],
+      };
+    } catch (error) {
+      console.error('Unexpected error in getCategoryBySlug:', error);
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to fetch category',
+      });
+    }
+  }),
   create: protectedProcedure
     .input(
       z.object({
@@ -115,6 +177,40 @@ export const categoriesRouter = createTRPCRouter({
           totalPages: Math.ceil((result.count ?? 0) / limit),
         },
       };
+    }),
+    getAllCategoriesPublic: publicProcedure
+    .query(async () => {
+      const result = await (await createClient())
+        .from('category')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (result.error) {
+        console.error('Error fetching categories:', result.error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: result.error.message,
+        });
+      }
+
+      return result.data ?? [];
+    }),
+  getAllWithoutPagination: publicProcedure
+    .query(async () => {
+      const result = await (await createClient())
+        .from('category')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (result.error) {
+        console.error('Error fetching categories:', result.error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: result.error.message,
+        });
+      }
+
+      return result.data ?? [];
     }),
   getCategoryById: protectedProcedure
     .input(

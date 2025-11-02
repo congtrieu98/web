@@ -8,6 +8,9 @@ import {
   ShoppingBasket,
   ShoppingCart,
   Users2,
+  Newspaper,
+  ListTree,
+  TagIcon
 } from 'lucide-react';
 
 export interface NavItem {
@@ -28,6 +31,9 @@ export const iconComponents = {
   ChartBarStacked,
   ShoppingBasket,
   logo: Command,
+  Newspaper,
+  ListTree,
+  TagIcon,
 };
 
 export const navConfig = [
@@ -52,6 +58,27 @@ export const navConfig = [
     isActive: false,
     items: [], // No child items
   },
+  {
+    title: 'Posts Category',
+    url: '/dashboard/postCategories',
+    icon: 'ListTree',
+    isActive: false,
+    items: [], // No child items
+  },
+  {
+    title: 'Posts',
+    url: '/dashboard/posts',
+    icon: 'Newspaper',
+    isActive: false,
+    items: [], // No child items
+  },
+  {
+    title: 'Brands',
+    url: '/dashboard/brands',
+    icon: 'TagIcon',
+    isActive: false,
+    items: [], // No child items
+  },
 ];
 
 export const pathName = {
@@ -60,4 +87,7 @@ export const pathName = {
   categories: '/dashboard/categories',
   subCategories: '/dashboard/sub-categories',
   products: '/dashboard/products',
+  postCategories: '/dashboard/postCategories',
+  posts: '/dashboard/posts',
+  brands: '/dashboard/brands',
 };

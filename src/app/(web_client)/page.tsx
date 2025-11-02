@@ -8,6 +8,7 @@ import ProductList from "@/components/ui/productCommon.tsx/productList";
 import NewsList from "@/components/web-layout/news";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { api } from "@/trpc/react";
 
 export default function Home() {
   const banners = [
@@ -31,8 +32,15 @@ export default function Home() {
     },
   ] as BannerItem[];
   const isMobile = useIsMobile()
+
+  const { data: categories } = api.category.getAllCategoriesPublic.useQuery();
+  const { data: productsHot } = api.products.getProductsByProductType.useQuery({
+    productType: {
+      'isHot': true,
+    },
+  });
   return (
-    <div className={cn("w-full h-full lg:px-[150px] md:px-[80px] px-0",
+    <div className={cn("w-full h-full px-0",
       { 'mt-32': isMobile }
     )}>
       {/* banner */}
@@ -53,12 +61,15 @@ export default function Home() {
 
       {/* Best saller */}
       <div className="px-5">
-        <BestSellers />
+        {/* @ts-ignore */}
+        <BestSellers productsHot={productsHot || []} />
       </div>
 
       {/* Product List */}
       <div className="px-5">
-        <ProductList />
+        {categories?.map((category) => (  
+          <ProductList key={category.id} categoryId={category.id} slug={category.slug || ''} text={category.name} />
+        ))}
       </div>
 
       {/* Product List */}

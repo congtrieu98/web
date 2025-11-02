@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Container from "../container"
-import { MapPin, MenuIcon, Newspaper, PcCase, Phone, Search, ShoppingCart } from "lucide-react"
+import { MapPin, Newspaper, PcCase, Phone, Search, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"

@@ -1,57 +1,32 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
-import { cn } from "@/lib/utils";
-import { BadgePlus, ChevronDown, FileText, Gift, RefreshCcw, ThumbsUp } from "lucide-react";
-import React, { useState } from "react";
+// import { cn } from "@/lib/utils";
+import { Product } from "@/types/main";
+import { BadgePlus, FileText, Gift, RefreshCcw, ThumbsUp } from "lucide-react";
+import React from "react";
 import { Carousel } from "react-responsive-carousel";
 
-const ProductDetail = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const ProductDetail = ({ product }: { product: Product }) => {
+  console.log('product', product);
 
-  const toggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
+  // const toggleExpand = () => {
+  //   setIsExpanded(!isExpanded);
+  // };
   return (
     <div className="">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Carousel image */}
         <div>
           <Carousel showArrows={true} emulateTouch={true} showStatus={false} dynamicHeight={true}>
-            <div>
-              <img
-                src="https://nguyencongpc.vn/media/product/250-27440-man-hinh-gigabyte-gs27fa-1.jpg"
-                className="object-contain mx-auto bg-white rounded-lg"
-                alt="Ảnh sản phẩm"
-              />
-            </div>
-            <div>
-              <img
-                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc.jpg"
-                className="object-contain mx-auto bg-white rounded-lg"
-                alt="Ảnh sản phẩm"
-              />
-            </div>
-            <div>
-              <img
-                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc1.jpg"
-                className="object-contain mx-auto bg-white rounded-lg"
-                alt="Ảnh sản phẩm"
-              />
-            </div>
-            <div>
-              <img
-                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc2.jpg"
-                className="object-contain mx-auto bg-white rounded-lg"
-                alt="Ảnh sản phẩm"
-              />
-            </div>
-            <div>
-              <img
-                src="https://nguyencongpc.vn/media/product/250-27440-gf27fa-ncpc3.jpg"
-                className="object-contain mx-auto bg-white rounded-lg"
-                alt="Ảnh sản phẩm"
-              />
-            </div>
+            {product.media.map((media, index) => (
+              <div key={index}>
+                <img
+                  src={media}
+                  className="object-contain mx-auto bg-white rounded-lg"
+                  alt="Ảnh sản phẩm"
+                />
+              </div>
+            ))}
           </Carousel>
 
 
@@ -83,23 +58,23 @@ const ProductDetail = () => {
 
         <div>
           <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Ổ Cứng HDD ASUS A561
+            {product.productName}
           </h1>
 
 
           <div className="flex gap-2 mb-4 items-center border rounded-2xl p-4 bg-white shadow-sm">
-            <p className="text-[#BF1F2C] text-2xl leading-5 font-extrabold">37.940.000đ</p>
-            <p className="text-lg text-gray-400 line-through font-medium">40.940.000đ</p>
+            <p className="text-[#BF1F2C] text-2xl leading-5 font-extrabold">{product.price}đ</p>
+            <p className="text-lg text-gray-400 line-through font-medium">{product.oldPrice && product.oldPrice}đ</p>
             <p className="text-sm text-red-600 font-semibold">
-              Tiết kiệm 3.000.000đ
+              Tiết kiệm {product.oldPrice && product.oldPrice - product.price}đ
             </p>
           </div>
 
 
           {/* Thông số sản phẩm */}
-          <div className=" border rounded-2xl  p-3 mb-6">
+          {/* <div className=" border rounded-2xl  p-3 mb-6">
             <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              Thông số sản phẩm
+              Thông tin sản phẩm
             </h2>
             <div
               className={cn('text-sm text-gray-700 list-disc pl-5 transition-all duration-300 max-h-20 overflow-hidden',
@@ -109,14 +84,7 @@ const ProductDetail = () => {
             >
               <ul>
                 <li>
-                  Tụ điện và cuộn cảm vượt qua các bài kiểm tra thử nghiệm khắt khe để đạt được chứng nhận
-                  độ bền chuẩn quân sự.
-                </li>
-                <li>
-                  Tụ trục kép có độ bền gấp đôi so với thiết kế tụ trục tự thông thường.
-                </li>
-                <li>
-                  Một lớp phủ PCB bảo vệ bảng mạch khỏi độ ẩm cao, bụi bẩn và nhiệt độ cao.
+                  {product.description}
                 </li>
                 <li>
                   Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
@@ -149,7 +117,7 @@ const ProductDetail = () => {
                 {isExpanded ? "Thu gọn" : "Xem thêm"} <ChevronDown size={16} className="inline" />
               </div>
             </button>
-          </div>
+          </div> */}
 
           {/* Quà tặng */}
           <div className="flex flex-col gap-2 mb-4 items-center rounded-lg bg-white shadow-sm" style={{ border: '1px solid transparent', backgroundImage: 'linear-gradient(white, white), linear-gradient(to right, #0F5B99, #E4A835)', backgroundOrigin: 'border-box', backgroundClip: 'content-box, border-box' }}>

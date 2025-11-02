@@ -6,7 +6,7 @@ import { MapPin, Phone, Star } from "lucide-react"
 
 export const LocationsFooter = () => {
     return (
-        <Container className='bg-[#FFFF] w-full grid grid-cols-1 md:grid-cols-4 gap-3 px-5'>
+        <Container className='bg-[#FFFF] w-full grid grid-cols-1 md:grid-cols-4 gap-3'>
             <div className="flex flex-col rounded-lg shadow-md w-full">
                 <div className="flex w-full">
                     <span className='rounded-tl-lg p-2.5 gap-2.5 bg-[rgba(228,168,53,1)] w-10 h-10 '>

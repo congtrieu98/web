@@ -1,5 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
+import { Category } from "@/types/main";
+import { DescriptionRenderer } from "@/components/ui/html-renderer";
 
 const articles = [
     {
@@ -24,27 +26,17 @@ const articles = [
     },
 ];
 
-const ContentWithSidebar = () => {
+const ContentWithSidebar = ({ category }: { category: Category }) => {
     return (
         <div className=" py-8">
             <div className="max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Main Content */}
                 <div className="bg-white col-span-2 p-4 sm:px-6 lg:px-8 rounded-lg shadow-md">
-                    <p className="text-sm text-gray-700 mb-4">
-                        Laptop gaming là dòng laptop được thiết kế để phục vụ cho việc chơi game. Sản phẩm được trang bị cấu hình mạnh mẽ, độ phân giải màn hình cao và hệ thống tản nhiệt hiệu quả, mang đến trải nghiệm tuyệt vời cho các game thủ.
-                    </p>
-                    <p className="text-sm text-gray-700 mb-4">
-                        CPU được xem là tiêu chí đầu tiên cần cân nhắc khi chọn mua laptop chơi game. Tùy thuộc vào nhu cầu sử dụng, dung lượng của game và điều kiện kinh tế mà bạn có thể chọn mua một chiếc laptop gaming có CPU phù hợp.
-                    </p>
-                    <div className="bg-gray-300 w-full h-64 rounded-md mb-4"></div>
-                    <p className="text-sm text-gray-700 mb-4">
-                        CPU được xem là tiêu chí đầu tiên cần cân nhắc khi chọn mua laptop chơi game. Tùy thuộc vào nhu cầu sử dụng, dung lượng của game và điều kiện kinh tế mà bạn có thể chọn mua một chiếc laptop gaming có CPU phù hợp.
-                    </p>
-                    <div className="text-center pb-4">
-                        <button className="px-6 py-2 border border-blue-500 text-blue-500 rounded-full text-sm font-semibold hover:bg-blue-50">
-                            Xem tất cả <span className="ml-2">▼</span>
-                        </button>
-                    </div>
+                <DescriptionRenderer
+                        description={category?.description || ''} 
+                        maxHeight="120px"
+                    />
+                    
                 </div>
 
                 {/* Sidebar */}

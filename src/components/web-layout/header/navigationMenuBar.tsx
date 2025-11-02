@@ -15,6 +15,8 @@ export interface MenuItem {
     label: string
     icon?: JSX.Element
     onClick?: () => void
+    id?: string
+    slug?: string
 }
 
 interface SidebarDropdownMenuProps {
@@ -36,6 +38,8 @@ export function SidebarDropdownMenu({
         variant === "default" && "bg-white hover:bg-white focus:bg-white active:bg-white",
         variant === "ghost" && "bg-transparent hover:bg-transparent! focus:bg-transparent! active:bg-transparent!"
     );
+
+    
     return (
         <NavigationMenu>
             <NavigationMenuList>
@@ -48,9 +52,9 @@ export function SidebarDropdownMenu({
                         <div className="flex flex-col space-y-1 w-56">
                             {menuItems.map((item, idx) => (
                                 <NavigationMenuLink
-                                    href={`/category/pc-dolozi`}
+                                    href={item.slug ? `/category/${item.slug}` : `/category/${item.id}`}
                                     key={idx}
-                                    // onClick={item.onClick}
+                                    onClick={item.onClick}
                                     className={cn(
                                         "flex items-center cursor-pointer hover:bg-[#0079FE]"
                                     )}

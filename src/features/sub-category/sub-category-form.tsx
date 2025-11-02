@@ -3,6 +3,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import CustomCKEditor from '@/components/ui/CKEditor/customCKEditor';
 import {
   Form,
   FormControl,
@@ -13,15 +14,17 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { pathName } from '@/config/dashboard';
 import { useToast } from '@/hooks/use-toast';
+import { base64ToFile, replaceBase64WithUrls, extractImageUrlsFromHtml } from '@/lib/utils';
 import { api } from '@/trpc/react';
 import { subCategory } from '@/types/main';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+import { useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -30,9 +33,7 @@ const formSchema = z.object({
   category_id: z.string().min(1, {
     message: 'Category name must be at least 1 characters.',
   }),
-  description: z.string().max(264, {
-    message: 'Description must be at most 264 characters.',
-  }),
+  description: z.string().optional().nullable(),
 });
 
 export default function SubCategoryForm({
@@ -42,6 +43,72 @@ export default function SubCategoryForm({
   initialData: subCategory | null;
   pageTitle: string;
 }) {
+  const supabase = createClient();
+  const [pendingCleanup, setPendingCleanup] = useState<{
+    oldContentImages?: string[];
+  }>({});
+
+  // Function để xóa ảnh cũ từ Supabase Storage
+  const deleteOldImages = useCallback(async (oldUrls: string[]) => {
+    if (oldUrls.length === 0) {
+      console.log('No old images to delete');
+      return;
+    }
+    
+    console.log('Starting to delete old images:', oldUrls);
+    
+    try {
+      await Promise.all(
+        oldUrls.map(async (url) => {
+          console.log('Processing URL for deletion:', url);
+          
+          // Extract path từ URL Supabase
+          if (url.includes('/storage/v1/object/public/')) {
+            const urlParts = url.split('/storage/v1/object/public/');
+            if (urlParts.length > 1) {
+              const filePath = urlParts[1];
+              console.log('Extracted file path:', filePath);
+              
+              const { error } = await supabase.storage
+                .from("category")
+                .remove([filePath]);
+              
+              if (error) {
+                console.error('Error deleting old image:', error);
+              } else {
+                console.log('Successfully deleted old image:', filePath);
+              }
+            } else {
+              console.error('Could not extract file path from URL:', url);
+            }
+          } else {
+            console.log('URL does not contain Supabase storage path:', url);
+          }
+        })
+      );
+    } catch (error) {
+      console.error('Error in deleteOldImages:', error);
+    }
+  }, [supabase]);
+
+  // Xử lý cleanup ảnh cũ khi có pendingCleanup
+  useEffect(() => {
+    const performCleanup = async () => {
+      if (pendingCleanup.oldContentImages?.length) {
+        console.log('Performing cleanup for:', pendingCleanup);
+        
+        if (pendingCleanup.oldContentImages.length > 0) {
+          await deleteOldImages(pendingCleanup.oldContentImages);
+        }
+        
+        // Clear pending cleanup
+        setPendingCleanup({});
+      }
+    };
+    
+    performCleanup();
+  }, [pendingCleanup, deleteOldImages]);
+
   const defaultValues = {
     name: initialData?.name || '',
     category_id: initialData?.category_id || '',
@@ -54,7 +121,7 @@ export default function SubCategoryForm({
 
   const { toast } = useToast();
 
-  const { data: listCategory, isLoading } = api.category.getAll.useQuery({});
+  const { data: listCategory, isLoading } = api.category.getAllWithoutPagination.useQuery();
 
 
   const createSubCategory = api.subCategory.create.useMutation({
@@ -100,20 +167,87 @@ export default function SubCategoryForm({
     values: defaultValues,
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log({ values });
-    if (initialData?.id) {
-      updateSubCategory.mutate({
-        id: initialData.id,
-        name: values.name,
-        description: values.description,
-        category_id: values.category_id
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(values.description ?? '', 'text/html');
+      let imgs = doc.querySelectorAll('img');
+
+      // Lưu ảnh cũ trong description để xóa sau
+      let oldContentImages: string[] = [];
+      if (initialData?.description) {
+        oldContentImages = extractImageUrlsFromHtml(initialData.description);
+      }
+
+      const uploadPromises = Array.from(imgs).map(async (img, index) => {
+        const src = img.getAttribute('src');
+        if (src?.startsWith('data:image')) {
+          const ext = src.split(';')[0].split('/')[1];
+          const filename = `image_${Date.now()}_${index + 1}.${ext}`;
+          const file = base64ToFile(src, filename);
+
+          let path = `${Date.now()}_${file.name}`;
+          const { data: url, error } = await supabase.storage
+            .from("category")
+            .upload(path, file);
+          
+          if (error) {
+            console.error('Error uploading content image:', error);
+            return null;
+          }
+          
+          return url?.fullPath || null;
+        }
+        return null;
       });
-    } else {
-      createSubCategory.mutate({
-        name: values.name,
-        description: values.description,
-        category_id: values.category_id
+
+      const urlListFromSupabase = (await Promise.all(uploadPromises)).filter(Boolean) as string[];
+
+      // Gán url nhận được từ Supabase vào src của image
+      const descriptionFinal = replaceBase64WithUrls(values.description ?? '', urlListFromSupabase);
+
+      if (initialData?.id) {
+        // Chuẩn bị cleanup data
+        const cleanupData: {
+          oldContentImages?: string[];
+        } = {};
+        
+        // Xóa ảnh description cũ nếu có
+        if (oldContentImages.length > 0) {
+          // Lấy ảnh mới trong description để so sánh
+          const newContentImages = extractImageUrlsFromHtml(descriptionFinal);
+          const imagesToDelete = oldContentImages.filter(oldImg => !newContentImages.includes(oldImg));
+          
+          if (imagesToDelete.length > 0) {
+            cleanupData.oldContentImages = imagesToDelete;
+          }
+        }
+        
+        // Update sub-category trước
+        updateSubCategory.mutate({
+          id: initialData.id,
+          name: values.name,
+          description: descriptionFinal || null,
+          category_id: values.category_id
+        });
+
+        // Set pending cleanup để useEffect xử lý
+        if (cleanupData.oldContentImages?.length) {
+          setPendingCleanup(cleanupData);
+        }
+      } else {
+        createSubCategory.mutate({
+          name: values.name,
+          description: descriptionFinal || null,
+          category_id: values.category_id
+        });
+      }
+    } catch (error) {
+      console.error('An error occurred:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'An error occurred',
+        variant: 'destructive',
       });
     }
   }
@@ -162,7 +296,7 @@ export default function SubCategoryForm({
                         </FormControl>
                         <SelectContent>
                           {
-                            listCategory?.data.map((cat) => <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>)
+                            listCategory?.map((cat) => <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>)
                           }
                         </SelectContent>
                       </Select>
@@ -179,10 +313,11 @@ export default function SubCategoryForm({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Enter product description"
-                      className="resize-none"
-                      {...field}
+                    <CustomCKEditor
+                      onChange={(data) =>
+                        field.onChange(data)
+                      }
+                      value={field.value ?? ''}
                     />
                   </FormControl>
                   <FormMessage />

@@ -2,7 +2,7 @@ import { removeAccents } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
 export const subCategoriesRouter = createTRPCRouter({
   create: protectedProcedure
@@ -119,6 +119,23 @@ export const subCategoriesRouter = createTRPCRouter({
           totalPages: Math.ceil((result.count ?? 0) / limit),
         },
       };
+    }),
+  getAllWithoutPagination: publicProcedure
+    .query(async () => {
+      const result = await (await createClient())
+        .from('sub_category')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (result.error) {
+        console.error('Error fetching sub_categories:', result.error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: result.error.message,
+        });
+      }
+
+      return result.data ?? [];
     }),
   getSubCategoryById: protectedProcedure
     .input(
