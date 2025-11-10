@@ -98,12 +98,16 @@ export const DescriptionRenderer = ({
         };
     }, [description, maxHeight]);
 
-    if (!description) return null;
+    if (!description) return (
+        <div className="flex justify-center items-center h-full w-full py-6">
+            <p className="text-center">Không có nội dung</p>
+        </div>
+    );
 
     return (
         <div className={className}>
             {/* Container với chiều cao cố định khi collapsed */}
-            <div 
+             <div 
                 ref={collapsedRef}
                 style={{
                     maxHeight: isExpanded ? 'none' : maxHeight,

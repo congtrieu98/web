@@ -2,7 +2,7 @@ import { removeAccents } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
-import { createTRPCRouter, protectedProcedure } from '../trpc';
+import { createTRPCRouter, protectedProcedure, publicProcedure } from '../trpc';
 
 export const postsRouter = createTRPCRouter({
   create: protectedProcedure
@@ -177,5 +177,67 @@ export const postsRouter = createTRPCRouter({
       return {
         message: 'Deleting post category successfully',
       };
+    }),
+  getAllPostsPublic: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(4),
+        page: z.number().min(1).default(1),
+      }).optional(),
+    )
+    .query(async ({ input }) => {
+      const limit = input?.limit ?? 4;
+      const page = input?.page ?? 1;
+      const offset = (page - 1) * limit;
+      
+      const result = await (await createClient())
+        .from('posts')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (result.error) {
+        console.error('Error fetching posts:', result.error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: result.error.message,
+        });
+      }
+
+      return {
+        data: result.data ?? [],
+        metadata: {
+          total: result.count ?? 0,
+          page,
+          limit,
+          totalPages: Math.ceil((result.count ?? 0) / limit),
+        },
+      };
+    }),
+  getPostBySlug: publicProcedure
+    .input(
+      z.object({
+        slug: z.string().min(1),
+      }),
+    )
+    .query(async ({ input }) => {
+      const result = await (await createClient())
+        .from('posts')
+        .select('*, post_category(name, slug)')
+        .eq('slug', input.slug)
+        .single();
+
+      if (result.error) {
+        console.error('Error fetching post by slug:', result.error);
+        if (result.error.code === 'PGRST116') {
+          return null;
+        }
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: result.error.message,
+        });
+      }
+
+      return result.data;
     }),
 });

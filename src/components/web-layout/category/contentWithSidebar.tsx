@@ -1,32 +1,14 @@
 /* eslint-disable @next/next/no-img-element */
+'use client';
+
 import React from "react";
 import { Category } from "@/types/main";
 import { DescriptionRenderer } from "@/components/ui/html-renderer";
-
-const articles = [
-    {
-        id: 1,
-        image: "/assets/news/news.png", // Thay bằng URL ảnh thực tế
-        title: "Top 100+ cấu hình PC Gaming giá tốt nhất năm 2024",
-    },
-    {
-        id: 2,
-        image: "/assets/news/news.png",
-        title: "Top 100+ cấu hình PC Gaming giá tốt nhất năm 2024",
-    },
-    {
-        id: 3,
-        image: "/assets/news/news.png",
-        title: "Top 100+ cấu hình PC Gaming giá tốt nhất năm 2024",
-    },
-    {
-        id: 4,
-        image: "/assets/news/news.png",
-        title: "Top 100+ cấu hình PC Gaming giá tốt nhất năm 2024",
-    },
-];
+import { api } from "@/trpc/react";
 
 const ContentWithSidebar = ({ category }: { category: Category }) => {
+    const { data: posts, isLoading } = api.posts.getAllPostsPublic.useQuery({ limit: 4 });
+
     return (
         <div className=" py-8">
             <div className="max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -43,22 +25,30 @@ const ContentWithSidebar = ({ category }: { category: Category }) => {
                 <div className="bg-white p-4 rounded-lg shadow-md">
                     <h2 className="text-lg font-bold text-gray-800 mb-4">TIN TỨC - KIẾN THỨC</h2>
                     <div className="flex flex-col gap-4">
-                        {articles.map((article) => (
-                            <div key={article.id} className="flex items-center gap-4">
-                                <img
-                                    src={article.image}
-                                    alt={article.title}
-                                    className="w-16 h-16 object-cover rounded-md"
-                                />
-                                <p className="text-sm text-gray-700 font-semibold">{article.title}</p>
-                            </div>
-                        ))}
+                        {isLoading ? (
+                            <div className="text-sm text-gray-500">Đang tải...</div>
+                        ) : posts && posts.data && posts.data.length > 0 ? (
+                            posts.data.map((post) => (
+                                <div key={post.id} className="flex items-center gap-4">
+                                    <img
+                                        src={post.thumbnail_url || "/assets/news/news.png"}
+                                        alt={post.title}
+                                        className="w-16 h-16 object-cover rounded-md"
+                                    />
+                                    <p className="text-sm text-gray-700 font-semibold">{post.title}</p>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-sm text-gray-500">Chưa có bài viết nào</div>
+                        )}
                     </div>
-                    <div className="text-center mt-4">
+                    {posts && posts.data && posts.data.length > 4 && (
+                        <div className="text-center mt-4">
                         <button className="px-6 py-2 border border-blue-500 text-blue-500 rounded-full text-sm font-semibold hover:bg-blue-50">
-                            Xem tất cả bài viết <span className="ml-2">▼</span>
-                        </button>
-                    </div>
+                                Xem tất cả bài viết <span className="ml-2">▼</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

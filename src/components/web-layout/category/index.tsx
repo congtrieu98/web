@@ -7,6 +7,7 @@ import FilterBar from "./filterBar";
 // import ProductList from "@/components/ui/productCommon.tsx/productList";
 import { Fragment } from "react";
 import { Category, Product } from "@/types/main";
+import Link from "next/link";
 
 
 export const CategoryPageLayout = ({ slugCat }: { slugCat: string }) => {
@@ -21,7 +22,7 @@ export const CategoryPageLayout = ({ slugCat }: { slugCat: string }) => {
             {/* Breadcrumb */}
             <div className="px-4 sm:px-6 lg:px-8 py-4">
                 <p className="text-sm text-gray-600">
-                    Trang chủ &gt; <span className="text-blue-500">{category?.name}</span>
+                    <Link href="/">Trang chủ</Link> &gt; <span className="text-blue-500">{category?.name}</span>
                 </p>
             </div>
 
@@ -31,10 +32,18 @@ export const CategoryPageLayout = ({ slugCat }: { slugCat: string }) => {
             </div>
 
             {/* Sản phẩm nổi bật */}
-            {productsHot && productsHot.length > 0 && (
+            {productsHot && productsHot.length > 0 ? (
                 <div className="my-5">
                     <BestSellers isShowBanner={false} isShowReadMore={false} productsHot={productsHot} title='Sản phẩm nổi bật' />
                 </div>
+            ) : (
+                <div className="bg-white col-span-2 p-4 sm:px-6 lg:px-8 rounded-lg shadow-md">
+                <div className="flex justify-center items-center h-full w-full py-6">
+                <p className="text-center">Không có sản phẩm nổi bật</p>
+            </div>
+                    
+                </div>
+                
             )}
 
             {/* Filter Bar */}

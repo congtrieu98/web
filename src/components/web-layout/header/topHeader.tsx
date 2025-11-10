@@ -68,7 +68,7 @@ export const TopHeader = () => {
                     </div>
                     <div className="flex flex-col items-center justify-center text-center w-[130px]">
                         <Newspaper className="w-6 h-6" size={25} />
-                        <span className="text-xs font-normal text-[rgba(255,255,255,1)] leading-5">Tin tức công nghệ</span>
+                        <Link href="/tin-tuc" className="text-xs font-normal text-[rgba(255,255,255,1)] leading-5">Tin tức công nghệ</Link>
                     </div>
                     <div className="flex flex-col items-center justify-center text-center w-[100px]">
                         <ShoppingCart className="w-6 h-6" size={25} />
