@@ -12,11 +12,8 @@ export const productsRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      console.log('input query', input);
-      
       try {
         const supabase = await createClient();
-        console.log('Supabase client created successfully');
         
         const result = await supabase
           .from('product')
@@ -24,16 +21,10 @@ export const productsRouter = createTRPCRouter({
           .eq('slug', input.slug)
           .single();
 
-        console.log('result query', result);
-        console.log('result.data:', result.data);
-        console.log('result.error:', result.error);
-
         if (result.error) {
-          console.error('Error fetching product by slug:', result.error);
           
           // Nếu không tìm thấy product, trả về null thay vì throw error
           if (result.error.code === 'PGRST116') {
-            console.log('Product not found with slug:', input.slug);
             return null;
           }
           
@@ -44,13 +35,11 @@ export const productsRouter = createTRPCRouter({
         }
 
         if (!result.data) {
-          console.log('No data returned for slug:', input.slug);
           return null;
         }
 
         return result.data;
       } catch (error) {
-        console.error('Unexpected error in getProductBySlug:', error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to fetch product',
@@ -82,7 +71,6 @@ export const productsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      console.log('input create:', input);
 
       const result = await (
         await createClient()
@@ -108,7 +96,6 @@ export const productsRouter = createTRPCRouter({
         .single();
 
       if (result.error) {
-        console.error('Error creating Products', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,
@@ -178,7 +165,6 @@ export const productsRouter = createTRPCRouter({
         .single();
 
       if (result.error) {
-        console.error('Error updating Products', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,
@@ -212,7 +198,6 @@ export const productsRouter = createTRPCRouter({
         .range(offset, offset + limit - 1);
 
       if (result.error) {
-        console.error('Error fetching categories:', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,
@@ -243,7 +228,6 @@ export const productsRouter = createTRPCRouter({
         .single();
 
       if (result.error) {
-        console.error('Error fetching Products:', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,
@@ -272,7 +256,6 @@ export const productsRouter = createTRPCRouter({
         .eq('id', input.id);
 
       if (result.error) {
-        console.error('Error updating Products', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,
@@ -302,7 +285,6 @@ export const productsRouter = createTRPCRouter({
         .limit(limit);
 
       if (result.error) {
-        console.error('Error fetching products by category:', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,
@@ -336,7 +318,6 @@ export const productsRouter = createTRPCRouter({
         .range(offset, offset + limit - 1);
 
       if (result.error) {
-        console.error('Error fetching products:', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,
@@ -376,10 +357,8 @@ export const productsRouter = createTRPCRouter({
         .order('created_at', { ascending: false })
         .limit(4);
 
-      console.log('result.data', result.data);
       
       if (result.error) {
-        console.error('Error fetching products by product type:', result.error);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: result.error.message,

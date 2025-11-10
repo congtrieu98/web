@@ -59,7 +59,6 @@ export default function BrandForm({
       router.push(pathName.brands);
     },
     onError: (error) => {
-      console.log('Error creating brand:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -79,7 +78,6 @@ export default function BrandForm({
       router.push(pathName.brands);
     },
     onError: (error) => {
-      console.log('Error updating brand:', error);
       toast({
         title: 'Error',
         description: error.message,

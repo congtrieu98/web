@@ -10,11 +10,13 @@ import Link from "next/link"
 import { api } from "@/trpc/react"
 import { JSX } from "react"
 import Container from "../container"
+import MobileSidebar from "./MobileSidebar"
 
 export const Header = () => {
     const isMobile = useIsMobile()
     const [isSticky, setIsSticky] = useState(false);
     const [search, setSearch] = useState('')
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
     // Fetch categories data
     const { data: categories, isLoading: categoriesLoading } = api.category.getAllCategoriesPublic.useQuery();
@@ -56,18 +58,21 @@ export const Header = () => {
         };
     }, []);
 
-    console.log('isMobile:', isMobile);
 
     if (isMobile) {
         return (
-            <div className="bg-[rgba(24,112,184,1)] fixed top-0 z-50 w-full">
-                <header className="text-white px-4 pt-3 pb-2">
-                    {/* Top row: Menu + Search + Logo */}
-                    <div className="flex items-center justify-between mb-2">
-                        {/* Menu icon */}
-                        <button className="text-white">
-                            <Menu size={24} />
-                        </button>
+            <>
+                <div className="bg-[rgba(24,112,184,1)] fixed top-0 z-50 w-full">
+                    <header className="text-white px-4 pt-3 pb-2">
+                        {/* Top row: Menu + Search + Logo */}
+                        <div className="flex items-center justify-between mb-2">
+                            {/* Menu icon */}
+                            <button 
+                                className="text-white"
+                                onClick={() => setSidebarOpen(true)}
+                            >
+                                <Menu size={24} />
+                            </button>
 
                         {/* Logo */}
 
@@ -117,6 +122,19 @@ export const Header = () => {
                     </nav>
                 </header>
             </div>
+            
+            {/* Mobile Sidebar */}
+            <MobileSidebar
+                open={sidebarOpen}
+                onOpenChange={setSidebarOpen}
+                menuItems={categoryItems.map(item => ({
+                    id: item.id,
+                    label: item.label,
+                    slug: item.slug,
+                    icon: item.icon
+                }))}
+            />
+        </>
         )
     }
     return (

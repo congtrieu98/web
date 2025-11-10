@@ -28,8 +28,6 @@ export default function CarouselCommon({ items }: CarouselCommonProps) {
     const scrollPrev = () => emblaApi?.scrollPrev()
     const scrollNext = () => {
         if (emblaApi) {
-            console.log('vào next');
-
             emblaApi.scrollNext()
         } else {
             console.error('Embla API is not initialized')

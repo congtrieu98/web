@@ -59,7 +59,6 @@ export async function signInWithEmail(formData: FormData) {
     options: options,
   });
 
-  console.log('Sign in with otp, data', data);
 
   if (error) {
     redirectPath = getErrorRedirect(

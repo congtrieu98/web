@@ -50,23 +50,19 @@ export default function CategoryForm({
   // Function để xóa ảnh cũ từ Supabase Storage
   const deleteOldImages = useCallback(async (oldUrls: string[]) => {
     if (oldUrls.length === 0) {
-      console.log('No old images to delete');
       return;
     }
     
-    console.log('Starting to delete old images:', oldUrls);
     
     try {
       await Promise.all(
         oldUrls.map(async (url) => {
-          console.log('Processing URL for deletion:', url);
           
           // Extract path từ URL Supabase
           if (url.includes('/storage/v1/object/public/')) {
             const urlParts = url.split('/storage/v1/object/public/');
             if (urlParts.length > 1) {
               const filePath = urlParts[1];
-              console.log('Extracted file path:', filePath);
               
               const { error } = await supabase.storage
                 .from("category")
@@ -75,18 +71,16 @@ export default function CategoryForm({
               if (error) {
                 console.error('Error deleting old image:', error);
               } else {
-                console.log('Successfully deleted old image:', filePath);
               }
             } else {
               console.error('Could not extract file path from URL:', url);
             }
           } else {
-            console.log('URL does not contain Supabase storage path:', url);
           }
         })
       );
     } catch (error) {
-      console.error('Error in deleteOldImages:', error);
+        console.error('Error in deleteOldImages:', error);
     }
   }, [supabase]);
 
@@ -94,7 +88,6 @@ export default function CategoryForm({
   useEffect(() => {
     const performCleanup = async () => {
       if (pendingCleanup.oldContentImages?.length) {
-        console.log('Performing cleanup for:', pendingCleanup);
         
         if (pendingCleanup.oldContentImages.length > 0) {
           await deleteOldImages(pendingCleanup.oldContentImages);
@@ -131,7 +124,6 @@ export default function CategoryForm({
       router.push(pathName.categories);
     },
     onError: (error) => {
-      console.log('Error creating category:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -151,7 +143,6 @@ export default function CategoryForm({
       router.push(pathName.categories);
     },
     onError: (error) => {
-      console.log('Error updating category:', error);
       toast({
         title: 'Error',
         description: error.message,

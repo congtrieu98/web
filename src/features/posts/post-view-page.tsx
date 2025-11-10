@@ -14,9 +14,6 @@ export default async function PostViewPage({
   let post = null;
   let pageTitle = 'Create New Post';
 
-  console.log('postIddđ:', postId);
-
-
   if (postId !== 'create') {
     const data = await api?.posts?.getPostById({ id: postId });
 

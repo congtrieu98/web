@@ -7,11 +7,7 @@ import React from "react";
 import { Carousel } from "react-responsive-carousel";
 
 const ProductDetail = ({ product }: { product: Product }) => {
-  console.log('product', product);
 
-  // const toggleExpand = () => {
-  //   setIsExpanded(!isExpanded);
-  // };
   return (
     <div className="">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -69,55 +65,6 @@ const ProductDetail = ({ product }: { product: Product }) => {
               Tiết kiệm {product.oldPrice && product.oldPrice - product.price}đ
             </p>
           </div>
-
-
-          {/* Thông số sản phẩm */}
-          {/* <div className=" border rounded-2xl  p-3 mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-2">
-              Thông tin sản phẩm
-            </h2>
-            <div
-              className={cn('text-sm text-gray-700 list-disc pl-5 transition-all duration-300 max-h-20 overflow-hidden',
-                { "max-h-full": isExpanded }
-              )}
-
-            >
-              <ul>
-                <li>
-                  {product.description}
-                </li>
-                <li>
-                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
-                  thành phần linh kiện cao cấp khác.
-                </li>
-                <li>
-                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
-                  thành phần linh kiện cao cấp khác.
-                </li>
-                <li>
-                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
-                  thành phần linh kiện cao cấp khác.
-                </li>
-                <li>
-                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
-                  thành phần linh kiện cao cấp khác.
-                </li>
-                <li>
-                  Mạch chống nhiễm 80 Plus Gold đạt được mức độ hiệu quả cao của điện Nhật Bản cũng các
-                  thành phần linh kiện cao cấp khác.
-                </li>
-              </ul>
-            </div>
-
-            <button
-              onClick={toggleExpand}
-              className="text-blue-500  text-sm mt-2"
-            >
-              <div className="flex gap-1 items-center">
-                {isExpanded ? "Thu gọn" : "Xem thêm"} <ChevronDown size={16} className="inline" />
-              </div>
-            </button>
-          </div> */}
 
           {/* Quà tặng */}
           <div className="flex flex-col gap-2 mb-4 items-center rounded-lg bg-white shadow-sm" style={{ border: '1px solid transparent', backgroundImage: 'linear-gradient(white, white), linear-gradient(to right, #0F5B99, #E4A835)', backgroundOrigin: 'border-box', backgroundClip: 'content-box, border-box' }}>

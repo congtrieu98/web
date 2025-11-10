@@ -10,7 +10,6 @@ export default function CategoryPage(props: {
     params: Promise<{ slug: string }>;
 }) {
     const { slug } = use(props.params);
-    console.log('slug in page app route:', slug);
     return (
         <Container className="bg-gray-50">
             <div className="px-5">

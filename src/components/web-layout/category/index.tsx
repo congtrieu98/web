@@ -12,7 +12,6 @@ import Link from "next/link";
 
 export const CategoryPageLayout = ({ slugCat }: { slugCat: string }) => {
     const { data: category } = api.category.getCategoryBySlug.useQuery({ slug: slugCat });
-    console.log('category:', category);
 
     // Cast products để phù hợp với type Product
     const productsHot = category?.products as Product[] | undefined;

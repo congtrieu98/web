@@ -29,7 +29,6 @@ export async function handleRequest(
 }
 
 export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
-  console.log('Signing in with Oauth');
   // Prevent default form submission refresh
   e.preventDefault();
   const formData = new FormData(e.currentTarget);

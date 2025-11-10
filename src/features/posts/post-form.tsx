@@ -60,23 +60,19 @@ export default function PostForm({
   // Function để xóa ảnh cũ từ Supabase Storage
   const deleteOldImages = useCallback(async (oldUrls: string[]) => {
     if (oldUrls.length === 0) {
-      console.log('No old images to delete');
       return;
     }
     
-    console.log('Starting to delete old images:', oldUrls);
     
     try {
       await Promise.all(
         oldUrls.map(async (url) => {
-          console.log('Processing URL for deletion:', url);
           
           // Extract path từ URL Supabase
           if (url.includes('/storage/v1/object/public/')) {
             const urlParts = url.split('/storage/v1/object/public/');
             if (urlParts.length > 1) {
               const filePath = urlParts[1];
-              console.log('Extracted file path:', filePath);
               
               const { error } = await supabase.storage
                 .from("posts")
@@ -84,20 +80,12 @@ export default function PostForm({
               
               if (error) {
                 console.error('Error deleting old image:', error);
-              } else {
-                console.log('Successfully deleted old image:', filePath);
               }
-            } else {
-              console.error('Could not extract file path from URL:', url);
             }
-          } else {
-            console.log('URL does not contain Supabase storage path:', url);
           }
         })
       );
-    } catch (error) {
-      console.error('Error in deleteOldImages:', error);
-    }
+    } catch (error) {}
   }, [supabase]);
 
   // Khởi tạo filesPreview từ initialData khi component mount
@@ -111,7 +99,6 @@ export default function PostForm({
   useEffect(() => {
     const performCleanup = async () => {
       if (pendingCleanup.oldThumbnailUrl || pendingCleanup.oldContentImages?.length) {
-        console.log('Performing cleanup for:', pendingCleanup);
         
         const urlsToDelete: string[] = [];
         
@@ -164,7 +151,6 @@ export default function PostForm({
       router.push(pathName.posts);
     },
     onError: (error) => {
-      console.log('Error creating posts:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -184,7 +170,6 @@ export default function PostForm({
       router.push(pathName.posts);
     },
     onError: (error) => {
-      console.log('Error updating posts:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -295,7 +280,6 @@ export default function PostForm({
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // console.log('value submit post:', values);
     let thumbnailUrl = values.thumbnailUrl;
     let oldThumbnailUrl = '';
     
@@ -326,13 +310,9 @@ export default function PostForm({
         }),
       );
       
-      console.log('Upload promises result:', uploadPromises);
-      console.log('First upload result:', uploadPromises[0]);
-      
       if (uploadPromises.length > 0 && uploadPromises[0]) {
         thumbnailUrl = process.env.NEXT_PUBLIC_SUPABASE_URL +
           "/storage/v1/object/public/" + uploadPromises[0];
-        console.log('Final thumbnail URL:', thumbnailUrl);
       } else {
         throw new Error('Failed to upload thumbnail');
       }
@@ -362,7 +342,6 @@ export default function PostForm({
             .upload(path, file);
           
           if (error) {
-            console.error('Error uploading content image:', error);
             return null;
           }
           
@@ -425,7 +404,6 @@ export default function PostForm({
       }
 
     } catch (error) {
-      console.error('An error occurred:', error);
       toast({
         title: 'Error',
         description: 'Tạo bài viết thất bại. Vui lòng kiểm tra lại.',

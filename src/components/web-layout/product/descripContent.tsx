@@ -37,7 +37,7 @@ const DescriptionContent = ({
     const technicalSpecs = formatSpecs(specs);
     return (
         <div className="py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 {/* Main Content */}
                 <div className="bg-white col-span-2 p-4 sm:px-6 lg:px-8 rounded-lg border shadow-md">
                     <DescriptionRenderer 
@@ -47,7 +47,7 @@ const DescriptionContent = ({
                 </div>
 
                 {/* Sidebar */}
-                <div className="bg-white p-4 rounded-lg shadow-md border">
+                <div className="bg-white p-4 rounded-lg shadow-md border self-start">
                     <h2 className="text-lg font-bold text-gray-800 mb-4">THÔNG SỐ KỸ THUẬT</h2>
                     
                     {technicalSpecs.length > 0 ? (

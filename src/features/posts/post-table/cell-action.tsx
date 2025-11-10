@@ -34,7 +34,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       setOpen(false);
     },
     onError: (error) => {
-      console.error('Error deleting post:', error);
       toast({
         title: 'Error',
         description: error.message,

@@ -64,7 +64,6 @@ export default function PostCategoryForm({
       router.push(pathName.postCategories);
     },
     onError: (error) => {
-      console.log('Error creating post category:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -84,7 +83,6 @@ export default function PostCategoryForm({
       router.push(pathName.postCategories);
     },
     onError: (error) => {
-      console.log('Error updating post category:', error);
       toast({
         title: 'Error',
         description: error.message,

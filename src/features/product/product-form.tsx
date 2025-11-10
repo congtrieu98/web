@@ -113,16 +113,13 @@ export default function ProductForm({
   // Function để xóa ảnh cũ từ Supabase Storage
   const deleteOldImages = useCallback(async (oldUrls: string[]) => {
     if (oldUrls.length === 0) {
-      console.log('No old images to delete');
       return;
     }
     
-    console.log('Starting to delete old images:', oldUrls);
     
     try {
       await Promise.all(
         oldUrls.map(async (url) => {
-          console.log('Processing URL for deletion:', url);
           
           // Extract path từ URL Supabase
           if (url.includes('/storage/v1/object/public/')) {
@@ -135,8 +132,6 @@ export default function ProductForm({
                 filePath = filePath.substring(9); // Loại bỏ "products/"
               }
               
-              console.log('Extracted file path:', filePath);
-              console.log('Original URL:', url);
               
               const { error } = await supabase.storage
                 .from("products")
@@ -144,19 +139,12 @@ export default function ProductForm({
               
               if (error) {
                 console.error('Error deleting old image:', error);
-              } else {
-                console.log('Successfully deleted old image:', filePath);
               }
-            } else {
-              console.error('Could not extract file path from URL:', url);
             }
-          } else {
-            console.log('URL does not contain Supabase storage path:', url);
           }
         })
       );
     } catch (error) {
-      console.error('Error in deleteOldImages:', error);
     }
   }, [supabase]);
 
@@ -175,7 +163,6 @@ export default function ProductForm({
       router.push(pathName.products);
     },
     onError: (error) => {
-      console.log('Error creating products:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -195,7 +182,6 @@ export default function ProductForm({
       router.push(pathName.products);
     },
     onError: (error) => {
-      console.log('Error updating products:', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -225,7 +211,6 @@ export default function ProductForm({
   useEffect(() => {
     const performCleanup = async () => {
       if (pendingCleanup.oldMediaUrls?.length || pendingCleanup.oldContentImages?.length) {
-        console.log('Performing cleanup for:', pendingCleanup);
         
         const urlsToDelete: string[] = [];
         
@@ -354,7 +339,6 @@ export default function ProductForm({
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('value submit product:', values);
     
     // Validate media field
     if (filesPreview.length === 0) {
@@ -383,7 +367,6 @@ export default function ProductForm({
             .upload(path, file);
           
           if (error) {
-            console.error('Error uploading media:', error);
             throw new Error(`Failed to upload media: ${error.message}`);
           }
           
@@ -395,7 +378,6 @@ export default function ProductForm({
         }),
       );
       
-      console.log('Media upload promises result:', uploadPromises);
       mediaUrls = uploadPromises;
     } else {
       // Nếu không có file mới, sử dụng ảnh từ initialData
@@ -426,7 +408,6 @@ export default function ProductForm({
             .upload(path, file);
           
           if (error) {
-            console.error('Error uploading content image:', error);
             return null;
           }
           

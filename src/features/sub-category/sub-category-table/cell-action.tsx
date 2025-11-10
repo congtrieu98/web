@@ -26,7 +26,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const { toast } = useToast();
   const deleteCategory = api.subCategory.delete.useMutation({
     onSuccess: async (data) => {
-      console.log({ data });
       await utils.subCategory.getAll.invalidate();
       toast({
         title: 'Success',
@@ -35,7 +34,6 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       setOpen(false);
     },
     onError: (error) => {
-      console.error('Error deleting sub category:', error);
       toast({
         title: 'Error',
         description: error.message,

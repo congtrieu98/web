@@ -13,8 +13,6 @@ export default async function ProductViewPage({
   let product = null;
   let pageTitle = 'Create New Product';
 
-  console.log('productIs:', productId);
-
 
   if (productId !== 'create') {
     const data = await api?.products?.getProductsById({ id: productId });

@@ -9,28 +9,6 @@ import { cn } from "@/lib/utils"
 
 export const TopHeader = () => {
     const isMobile = useIsMobile()
-    console.log('isMobile:', isMobile);
-
-    // if (isMobile) {
-    //     return (
-    //         <Container>
-    //             <div className="flex py-2 px-3">
-    //                 <div className="flex flex-col justify-between">
-    //                     <span>
-    //                         <MenuIcon />
-    //                     </span>
-    //                     <div className="flex gap-2">
-    //                         <Link href={'/'} className="flex items-center gap-4 w-[250px] shrink-0">
-    //                             <Image src="/logo.svg" alt="Logo" width={56} height={56} className="w-14 h-14" />
-    //                             <span className="text-2xl font-black text-white">DoloziStore</span>
-    //                         </Link>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </Container>
-    //     )
-    // }
-
     return (
         <Container>
             <header className=" text-white flex items-center justify-between px-4">

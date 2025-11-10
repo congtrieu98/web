@@ -16,7 +16,6 @@ export default async function SubCategoryViewPage({
   if (subCategoryId !== 'create') {
     const data = await api?.subCategory?.getSubCategoryById({ id: subCategoryId });
 
-    console.log({ data });
     subCategory = data as unknown as subCategory;
     if (!subCategory) {
       notFound();
