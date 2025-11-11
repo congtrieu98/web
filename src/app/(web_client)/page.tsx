@@ -11,26 +11,6 @@ import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
 
 export default function Home() {
-  const banners = [
-    // {
-    //   type: 'single',
-    //   images: [{ src: '/assets/banner/main.png', alt: 'Main Banner' }],
-    // },
-    {
-      type: 'grid',
-      images: [
-        { src: '/assets/banner/banner1.webp', alt: 'Banner 1' },
-        { src: '/assets/banner/banner1.webp', alt: 'Banner 1' },
-      ],
-    },
-    {
-      type: 'grid',
-      images: [
-        { src: '/assets/banner/banner2.webp', alt: 'Banner 2' },
-        { src: '/assets/banner/banner2.webp', alt: 'Banner 2' },
-      ],
-    },
-  ] as BannerItem[];
   const isMobile = useIsMobile()
 
   const { data: categories } = api.category.getAllCategoriesPublic.useQuery();
@@ -39,6 +19,41 @@ export default function Home() {
       'isHot': true,
     },
   });
+  const { data: bannersData } = api.banners.getAllPublic.useQuery();
+  
+  // Transform banners data to match BannerItem format
+  // For grid type: split images into slides of 2 images each
+  // For single type: each image = 1 slide
+  // Each image has its own linkProduct
+  const banners: BannerItem[] = bannersData?.flatMap((banner) => {
+    const images = banner.images as { src: string; alt?: string; linkProduct?: string | null }[] || [];
+    
+    if (banner.type === 'grid') {
+      // Split grid images into slides of 2 images each
+      const slides: BannerItem[] = [];
+      for (let i = 0; i < images.length; i += 2) {
+        slides.push({
+          type: 'grid',
+          images: images.slice(i, i + 2).map(img => ({
+            src: img.src,
+            alt: img.alt,
+            linkProduct: img.linkProduct || null,
+          })), // Take 2 images per slide, each with its own linkProduct
+        });
+      }
+      return slides;
+    } else {
+      // Single type: each image = 1 slide
+      return images.map((image) => ({
+        type: 'single' as const,
+        images: [{
+          src: image.src,
+          alt: image.alt,
+          linkProduct: image.linkProduct || null,
+        }], // Each slide has 1 image with its own linkProduct
+      }));
+    }
+  }) as BannerItem[] || [];
   return (
     <div className={cn("w-full h-full px-0",
       { 'mt-32': isMobile }

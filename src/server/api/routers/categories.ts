@@ -23,11 +23,9 @@ export const categoriesRouter = createTRPCRouter({
         .single();
 
       if (categoryResult.error) {
-        console.error('Error fetching category by slug:', categoryResult.error);
         
         // Nếu không tìm thấy category, trả về null thay vì throw error
         if (categoryResult.error.code === 'PGRST116') {
-          console.log('Category not found with slug:', input.slug);
           return null;
         }
         
@@ -38,7 +36,6 @@ export const categoriesRouter = createTRPCRouter({
       }
 
       if (!categoryResult.data) {
-        console.log('No data returned for slug:', input.slug);
         return null;
       }
 

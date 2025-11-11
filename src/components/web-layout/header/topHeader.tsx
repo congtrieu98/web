@@ -2,10 +2,11 @@
 
 import Image from "next/image"
 import Container from "../container"
-import { MapPin, Newspaper, PcCase, Phone, Search, ShoppingCart } from "lucide-react"
+import { MapPin, Newspaper, PcCase, Phone, ShoppingCart } from "lucide-react"
 import Link from "next/link"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import { ProductSearchBar } from "@/components/ui/product-search-bar"
 
 export const TopHeader = () => {
     const isMobile = useIsMobile()
@@ -21,16 +22,9 @@ export const TopHeader = () => {
                 {/* Tìm kiếm + Map */}
                 <div className="flex items-center w-full max-w-[420px] mx-4 gap-2">
                     <MapPin className="w-5 h-5 text-white" size={25} />
-                    <div className="flex items-center flex-grow bg-white rounded px-2 py-3">
-                        <input
-                            type="text"
-                            placeholder="Bạn cần tìm gì?"
-                            className="w-full outline-none text-black text-sm placeholder-gray-500"
-                        />
-                        <button>
-                            <Search className="w-5 h-5 text-gray-700" />
-                        </button>
-                    </div>
+                    <ProductSearchBar 
+                        inputClassName="rounded px-2 py-3"
+                    />
                 </div>
 
                 {/* Menu icons */}

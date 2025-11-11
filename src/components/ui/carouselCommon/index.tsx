@@ -6,6 +6,7 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 import { useIsMobile } from '@/hooks/use-mobile'
 
@@ -14,6 +15,7 @@ export type BannerItem = {
     images: {
         src: string
         alt?: string
+        linkProduct?: string | null // Product slug for this specific image
     }[]
 }
 
@@ -37,43 +39,49 @@ export default function CarouselCommon({ items }: CarouselCommonProps) {
     return (
         <div className="relative w-full overflow-hidden">
             <div className="overflow-hidden rounded-lg" ref={emblaRef}>
-                <div className="flex">
-                    {items.map((item, index) => (
-                        <div
-                            key={index}
-                            className="flex-[0_0_100%] p-1" // slide full width
-                        >
-                            {isMobile ? <Image
-                                src={item.images[0].src}
-                                alt={item.images[0].alt || 'Banner'}
-                                width={1200}
-                                height={400}
-                                className="w-full h-auto object-cover rounded-lg"
-                            /> :
-                                item.type === 'single' ? (
-                                    <Image
-                                        src={item.images[0].src}
-                                        alt={item.images[0].alt || 'Banner'}
-                                        width={1200}
-                                        height={400}
-                                        className="w-full h-auto object-cover rounded-lg"
-                                    />
+                <div className="flex h-[172px]">
+                    {items.map((item, index) => {
+                        // Render single image with its own link
+                        const renderImageWithLink = (img: { src: string; alt?: string; linkProduct?: string | null }, idx: number) => {
+                            const link = img.linkProduct ? `/products/${img.linkProduct}` : null;
+                            const imageElement = (
+                                <Image
+                                    key={idx}
+                                    src={img.src}
+                                    alt={img.alt || `Banner ${idx + 1}`}
+                                    width={item.type === 'single' ? 1200 : 600}
+                                    height={item.type === 'single' ? 400 : 300}
+                                    className="w-full h-auto object-cover rounded-lg cursor-pointer"
+                                />
+                            );
+
+                            if (link) {
+                                return (
+                                    <Link key={idx} href={link}>
+                                        {imageElement}
+                                    </Link>
+                                );
+                            }
+                            return imageElement;
+                        };
+
+                        return (
+                            <div
+                                key={index}
+                                className="flex-[0_0_100%] p-1" // slide full width
+                            >
+                                {isMobile ? (
+                                    renderImageWithLink(item.images[0], 0)
+                                ) : item.type === 'single' ? (
+                                    renderImageWithLink(item.images[0], 0)
                                 ) : (
                                     <div className="grid lg:grid-cols-2 gap-2">
-                                        {item.images.map((img, idx) => (
-                                            <Image
-                                                key={idx}
-                                                src={img.src}
-                                                alt={img.alt || `Banner ${idx + 1}`}
-                                                width={600}
-                                                height={300}
-                                                className="w-full h-auto object-cover rounded-lg"
-                                            />
-                                        ))}
+                                        {item.images.map((img, idx) => renderImageWithLink(img, idx))}
                                     </div>
                                 )}
-                        </div>
-                    ))}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

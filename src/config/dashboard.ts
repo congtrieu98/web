@@ -10,7 +10,8 @@ import {
   Users2,
   Newspaper,
   ListTree,
-  TagIcon
+  TagIcon,
+  Image as ImageIcon
 } from 'lucide-react';
 
 export interface NavItem {
@@ -34,6 +35,7 @@ export const iconComponents = {
   Newspaper,
   ListTree,
   TagIcon,
+  ImageIcon,
 };
 
 export const navConfig = [
@@ -79,6 +81,13 @@ export const navConfig = [
     isActive: false,
     items: [], // No child items
   },
+  {
+    title: 'Banners',
+    url: '/dashboard/banners',
+    icon: 'ImageIcon',
+    isActive: false,
+    items: [], // No child items
+  },
 ];
 
 export const pathName = {
@@ -90,4 +99,5 @@ export const pathName = {
   postCategories: '/dashboard/postCategories',
   posts: '/dashboard/posts',
   brands: '/dashboard/brands',
+  banners: '/dashboard/banners',
 };

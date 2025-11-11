@@ -334,6 +334,23 @@ export const productsRouter = createTRPCRouter({
         },
       };
     }),
+  getAllProductsForSelect: protectedProcedure
+    .query(async () => {
+      const result = await (await createClient())
+        .from('product')
+        .select('id, productName, slug')
+        .order('productName', { ascending: true });
+
+      if (result.error) {
+        console.error('Error fetching products:', result.error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: result.error.message,
+        });
+      }
+
+      return result.data ?? [];
+    }),
   getProductsByProductType: publicProcedure
     .input(
       z.object({

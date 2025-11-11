@@ -89,3 +89,20 @@ export interface Brand {
   updated_by: string | null;
   slug?: string;
 }
+
+export interface Banner {
+  id: string /* primary key */;
+  title: string;
+  type: 'single' | 'grid';
+  images: {
+    src: string;
+    alt?: string;
+    linkProduct?: string | null; // Product slug for this specific image
+  }[];
+  order_index: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  created_by: string;
+  updated_by: string | null;
+}

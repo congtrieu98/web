@@ -69,7 +69,7 @@ export const ProductPageLayout = ({ slugProduct }: { slugProduct: string }) => {
             {/* Breadcrumb */}
             <div className="px-4 sm:px-6 lg:px-8 py-4">
                 <p className="text-sm text-gray-600">
-                    Trang chủ &gt; <span className="text-blue-500">Thiết bị lưu trữ</span>
+                    <Link href="/" className="">Trang chủ</Link> &gt; <span className="text-blue-500">{product.productName}</span>
                 </p>
             </div>
 
