@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
-import { getURL } from '@/utils/helpers';
 import { siteConfig } from '@/config/site';
 import { ThemeProvider } from '@/components/theme-provider';
 import { TRPCReactProvider } from '@/trpc/react';
@@ -22,7 +21,7 @@ export const viewport: Viewport = {
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getURL()),
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.name,
     template: `%s | ${siteConfig.name}`,
@@ -69,6 +68,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: '/logo.svg',
+
   },
   manifest: `${siteConfig.url}/site.webmanifest`,
 };
