@@ -1,11 +1,11 @@
 import { SiteConfig } from '@/types';
 
 export const siteConfig: SiteConfig = {
-  name: 'Dolozi Store',
+  name: 'Dolozi Store - Cửa hàng máy tính PC đồ họa, PC Gaming chuyên nghiệp',
   description:
-    'A complete & open-source Next.js 14 Subscription Starter template using Supabase, Stripe, Tailwind CSS.',
-  url: 'https://hikari.antoineross.com',
-  ogImage: 'https://hikari.antoineross.com/og.jpg',
+    'Mua máy tính đồ họa, PC gaming, máy tính văn phòng, laptop gaming, PC AI, Build PC, CPU, VGA, màn hình máy tính chính hãng tại Dolozi Store giá rẻ nhất',
+  url: 'https://dolozistore.com',
+  ogImage: '/assets/banner/banner-thumb.jpg',
   links: {
     twitter: 'https://twitter.com/antoineross__',
     github: 'https://github.com/antoineross/hikari',
