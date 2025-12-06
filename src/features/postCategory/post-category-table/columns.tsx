@@ -15,9 +15,6 @@ export const columns: ColumnDef<PostCategory>[] = [
   {
     accessorKey: 'description',
     header: 'Description',
-    // cell: ({ row }) => {
-    //   console.log('row post cat:', row);
-    // }
   },
   {
     id: 'actions',

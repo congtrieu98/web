@@ -358,8 +358,6 @@ export const productsRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-      console.log('input.productType', input.productType);
-      
       // Build query for JSONB field
       let query = (await createClient())
         .from('product')
